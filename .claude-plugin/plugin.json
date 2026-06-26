@@ -1,0 +1,9 @@
+{
+  "name": "coeus",
+  "version": "3.9.0",
+  "description": "EP-industry skill suite for high-stakes decisions — LLM-Council multi-model deliberation, Morpheus prompt-engineering pipeline, The Architect adaptive combo, EP-Council 9-supermajor adversarial deal review, Plugin-Creator, the new Coeus-Router (Tier-3 meta-skill), plus bundled Caveman (token compression) and Prompt-Master. v3.8.0 adopts the Clustered-Modular-with-Delegation skill architecture (3-tier model, 3,000-token cap, shared-rules convention, canonical registry).",
+  "author": {
+    "name": "ENERGEIA SERVICES PTE. LTD.",
+    "url": "https://github.com/keithceh/Coeus"
+  }
+}
