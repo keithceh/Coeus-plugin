@@ -1,0 +1,9 @@
+{
+  "name": "coeus",
+  "version": "3.10.1",
+  "description": "EP-industry skill suite for high-stakes decisions — LLM-Council multi-model deliberation, Morpheus prompt-engineering pipeline, The Architect adaptive combo, EP-Council 9-supermajor adversarial deal review, Plugin-Creator, the Coeus-Router (Tier-3 meta-skill), plus bundled Caveman and Prompt-Master. v3.10.0 introduces the seismic family — `dug_projdb` extracts horizons, polygons, volumes, and per-volume process history (with full parameters and resolved UUIDs) from a DUG Insight project.dugprj SQLite database. v3.8.0 adopted the Clustered-Modular-with-Delegation skill architecture (3-tier model, 3,000-token cap, shared-rules convention, canonical registry).",
+  "author": {
+    "name": "ENERGEIA SERVICES PTE. LTD.",
+    "url": "https://github.com/keithceh/Coeus"
+  }
+}
