@@ -1,0 +1,100 @@
+Business Source License 1.1
+
+Parameters
+
+Licensor:             ENERGEIA SERVICES PTE. LTD. (202401987H)
+Licensed Work:        The Coeus skill suite, including LLM-council, Morpheus,
+                      and The Architect
+                      The Licensed Work is (c) 2024 ENERGEIA SERVICES PTE. LTD.
+Additional Use Grant: None
+Change Date:          May 28, 2028
+Change License:       Apache License, Version 2.0
+
+---
+
+Terms
+
+The Licensor hereby grants you the right to copy, modify, create derivative
+works, redistribute, and make non-production use of the Licensed Work. The
+Licensor may make an Additional Use Grant, above, permitting limited production
+use.
+
+Effective on the Change Date, or the fourth anniversary of the first publicly
+available distribution of a specific version of the Licensed Work under this
+License, whichever comes first, the Licensor hereby grants you rights under the
+terms of the Change License, and the rights granted in the paragraph above
+terminate.
+
+If your use of the Licensed Work does not comply with the requirements currently
+in effect as described in this License, you must purchase a commercial license
+from the Licensor, its affiliated entities, or authorized resellers, or you must
+refrain from using the Licensed Work.
+
+All copies of the original and modified Licensed Work, and derivative works of
+the Licensed Work, are subject to this License. This License applies separately
+for each version of the Licensed Work and the Change Date may vary for each
+version of the Licensed Work released by Licensor.
+
+You must conspicuously display this License on each original or modified copy
+of the Licensed Work. If you receive the Licensed Work in original or modified
+form from a third party, the terms and conditions set forth in this License
+apply to your use of that work.
+
+Any use of the Licensed Work in violation of this License will automatically
+terminate your rights under this License for the current and all other versions
+of the Licensed Work.
+
+This License does not grant you any right in any trademark or logo of Licensor
+or its affiliates (provided that you may use a trademark or logo of Licensor as
+expressly required by this License).
+
+---
+
+AS-A-SERVICE RESTRICTION
+
+You may not offer the Licensed Work, or any derivative thereof, as a hosted or
+managed service to third parties without a separate commercial agreement with
+the Licensor. This restriction applies to any service in which a significant
+feature of the value proposition is the functionality of the Licensed Work.
+
+---
+
+MODEL DISTILLATION PROHIBITION
+
+You may not use the Licensed Work, its outputs, or any derivative works to
+train, fine-tune, distill, or otherwise improve any machine learning model,
+large language model, or artificial intelligence system without express written
+permission from the Licensor.
+
+---
+
+AUTONOMOUS AGENTIC LIABILITY WAIVER
+
+THE LICENSED WORK IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. THE
+LICENSOR SHALL NOT BE LIABLE FOR ANY DECISIONS, ACTIONS, OR CONSEQUENCES
+ARISING FROM THE USE OF THIS WORK IN AUTONOMOUS OR AGENTIC CONTEXTS, INCLUDING
+BUT NOT LIMITED TO AUTOMATED PIPELINES, AI AGENTS, OR MULTI-MODEL SYSTEMS. THE
+USER ASSUMES ALL RISK AND RESPONSIBILITY FOR REVIEWING AND VALIDATING ANY OUTPUT
+BEFORE ACTING UPON IT.
+
+---
+
+CHANGE TO PERMISSIVE LICENSE
+
+Effective May 28, 2028, the Licensor grants you rights under the terms of the
+Apache License, Version 2.0 (https://www.apache.org/licenses/LICENSE-2.0), and
+the rights granted under the Business Source License 1.1 above terminate.
+
+---
+
+NOTICES
+
+If you use this software in a product, an acknowledgment in the product
+documentation would be appreciated but is not required.
+
+---
+
+GOVERNING LAW
+
+This License shall be governed by and construed in accordance with the laws of
+the Republic of Singapore, without regard to its conflict of law provisions.

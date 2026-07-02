@@ -1,0 +1,97 @@
+name: Announce new release
+
+# Runs INSIDE the public mirror (keithceh/Coeus-plugin) every time release.yml
+# (in the source repo) publishes a new mirror release. Posts the release notes
+# as a new GitHub Discussion in the "Announcements" category. Anyone watching
+# the repo for releases — OR subscribed to the Discussions category — gets a
+# notification (and email, per their GitHub notification settings).
+#
+# Why this instead of an "input your email" form?
+#   - GitHub already owns the user's verified email and the unsubscribe path.
+#     A separate SMTP form would re-implement infrastructure GitHub gives
+#     away free, plus add a subscriber-list-storage problem.
+#   - Users opt in once: click Watch -> Custom -> Releases on the mirror, OR
+#     click Subscribe on the Announcements discussion category.
+#   - Cancellation is one click. No bounce handling, no GDPR overhead.
+#
+# ONE-TIME SETUP (on keithceh/Coeus-plugin):
+#   1. Settings -> General -> Features: enable Discussions.
+#   2. Discussions -> Categories -> New category named "Announcements"
+#      with format "Announcement".
+#   3. Pin a "Get release notifications" discussion explaining the Watch
+#      and Subscribe paths.
+#
+# This workflow is staged onto the mirror by the source repo's release.yml
+# (see "Stage mirror-only workflows" step). Editing it here propagates on
+# the next tag.
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  discussions: write
+  contents: read
+
+jobs:
+  announce:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post release announcement to Discussions
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.release.tag_name }}
+          NAME: ${{ github.event.release.name }}
+          BODY: ${{ github.event.release.body }}
+          URL: ${{ github.event.release.html_url }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -eu
+
+          # Locate Announcements category id via GraphQL.
+          CATEGORY_ID=$(gh api graphql -f query='
+            query($owner:String!, $name:String!) {
+              repository(owner:$owner, name:$name) {
+                discussionCategories(first: 20) {
+                  nodes { id name }
+                }
+              }
+            }' -F owner="${REPO%/*}" -F name="${REPO#*/}" \
+            --jq '.data.repository.discussionCategories.nodes[] | select(.name=="Announcements") | .id')
+
+          if [ -z "${CATEGORY_ID:-}" ]; then
+            echo "::warning::No 'Announcements' Discussions category on ${REPO}. Skipping announcement."
+            echo "::warning::Setup: Discussions -> Categories -> create one named 'Announcements'."
+            exit 0
+          fi
+
+          REPO_ID=$(gh api graphql -f query='
+            query($owner:String!, $name:String!) {
+              repository(owner:$owner, name:$name) { id }
+            }' -F owner="${REPO%/*}" -F name="${REPO#*/}" --jq '.data.repository.id')
+
+          TITLE="Release ${TAG} — ${NAME:-${TAG}}"
+          DISCUSSION_BODY=$(cat <<EOF
+          ${BODY}
+
+          ---
+          **Full release page:** ${URL}
+
+          _To get future releases by email: click **Watch** on this repo (Custom -> Releases), or click **Subscribe** on this Announcements category._
+          EOF
+          )
+
+          gh api graphql -f query='
+            mutation($repoId:ID!, $categoryId:ID!, $title:String!, $body:String!) {
+              createDiscussion(input:{
+                repositoryId: $repoId,
+                categoryId: $categoryId,
+                title: $title,
+                body: $body
+              }) { discussion { url } }
+            }' \
+            -F repoId="${REPO_ID}" \
+            -F categoryId="${CATEGORY_ID}" \
+            -F title="${TITLE}" \
+            -F body="${DISCUSSION_BODY}" \
+            --jq '.data.createDiscussion.discussion.url'
