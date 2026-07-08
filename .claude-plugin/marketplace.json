@@ -1,0 +1,20 @@
+{
+  "name": "coeus",
+  "owner": {
+    "name": "ENERGEIA SERVICES PTE. LTD.",
+    "url": "https://github.com/keithceh/Coeus"
+  },
+  "description": "Coeus public plugin mirror — EP-industry decision councils, prompt engineering pipeline, plugin authoring, DOCX tooling, and project lifecycle management. The source repo (private, BSL 1.1) builds the bundle; this repo distributes it for the Claude plugin marketplace install path.",
+  "plugins": [
+    {
+      "name": "coeus",
+      "source": {
+        "source": "github",
+        "repo": "keithceh/Coeus-plugin"
+      },
+      "description": "12-skill suite: llm-council, ep-council, the-architect, morpheus, prompt-master, caveman, plugin-creator, coeus-router, ooxml-repair, ooxml-fields, docx-inventory, project-lifecycle.",
+      "category": "decision-support",
+      "tags": ["council", "ep-industry", "prompt-engineering", "docx", "lifecycle"]
+    }
+  ]
+}
