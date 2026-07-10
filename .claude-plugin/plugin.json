@@ -1,0 +1,9 @@
+{
+  "name": "coeus",
+  "version": "3.17.0",
+  "description": "E&P-industry skill suite for high-stakes decisions: LLM-Council multi-model deliberation, EP-Council 9-supermajor adversarial deal review, Morpheus prompt-engineering pipeline, The Architect adaptive combo, Plugin-Creator, Coeus-Router (Tier-3 meta-skill), Project-Lifecycle, Office Tools (OOXML repair/fields/inventory), Seismic Tools (dug_binary extracts horizons, polygons, volumes, per-volume process history, and volume lineage from DUG Insight project.dugprj into user-selected xlsx/DOCX/HTML artefacts), plus bundled Caveman and Prompt-Master.",
+  "author": {
+    "name": "ENERGEIA SERVICES PTE. LTD.",
+    "url": "https://github.com/keithceh/Coeus"
+  }
+}
