@@ -1,0 +1,86 @@
+name: Release reminders
+
+# Runs INSIDE the public mirror (keithceh/Coeus-plugin).
+# Complements release-announce.yml (which posts once per published release):
+#   - 7 days after the latest release: one repeat reminder discussion.
+#   - 1st of each month: one summary discussion of the month's releases.
+# The mirror has no issue tracker in active use, so the monthly summary is
+# releases-only here; the source repo's summary covers issues.
+#
+# Staged onto the mirror by the source repo's release.yml on every tag.
+
+on:
+  schedule:
+    - cron: '0 10 * * *'   # daily 10:00 UTC; branch at runtime
+  workflow_dispatch:
+
+permissions:
+  discussions: write
+  contents: read
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post reminder / monthly summary
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          set -eu
+
+          OWNER="${REPO%/*}"; NAME="${REPO#*/}"
+
+          CATEGORY_ID=$(gh api graphql -f query='
+            query($owner:String!, $name:String!) {
+              repository(owner:$owner, name:$name) {
+                discussionCategories(first: 20) { nodes { id name } }
+              }
+            }' -F owner="$OWNER" -F name="$NAME" \
+            --jq '.data.repository.discussionCategories.nodes[] | select(.name=="Announcements") | .id')
+
+          if [ -z "${CATEGORY_ID:-}" ]; then
+            echo "::warning::No Announcements category -- skipping."
+            exit 0
+          fi
+
+          REPO_ID=$(gh api graphql -f query='
+            query($owner:String!, $name:String!) { repository(owner:$owner, name:$name) { id } }' \
+            -F owner="$OWNER" -F name="$NAME" --jq '.data.repository.id')
+
+          new_discussion() {
+            gh api graphql -f query='
+              mutation($repoId:ID!, $categoryId:ID!, $title:String!, $body:String!) {
+                createDiscussion(input:{repositoryId:$repoId, categoryId:$categoryId, title:$title, body:$body})
+                { discussion { url } }
+              }' -F repoId="$REPO_ID" -F categoryId="$CATEGORY_ID" \
+              -F title="$1" -F body="$2" --jq '.data.createDiscussion.discussion.url'
+          }
+
+          # --- 7-day repeat ------------------------------------------------
+          LATEST=$(gh api "repos/${REPO}/releases/latest" 2>/dev/null || echo "")
+          if [ -n "${LATEST}" ]; then
+            PUB=$(echo "${LATEST}" | jq -r '.published_at' | cut -dT -f1)
+            TAG=$(echo "${LATEST}" | jq -r '.tag_name')
+            URL=$(echo "${LATEST}" | jq -r '.html_url')
+            if [ "${PUB}" = "$(date -u -d '7 days ago' +%F)" ]; then
+              new_discussion "Reminder: ${TAG} shipped one week ago" \
+                "Update if you haven't yet. In Claude Code: \`/plugin marketplace update coeus && /plugin update coeus\`. Release page: ${URL}"
+              echo "::notice::7-day reminder posted for ${TAG}."
+            fi
+          fi
+
+          # --- Monthly summary (1st) ----------------------------------------
+          if [ "$(date -u +%d)" = "01" ] || [ "${EVENT}" = "workflow_dispatch" ]; then
+            SINCE=$(date -u -d "1 month ago" +%F)
+            RELS=$(gh api "repos/${REPO}/releases?per_page=20" \
+              --jq "[.[] | select(.published_at >= \"${SINCE}\")] | map(\"- [\(.tag_name)](\(.html_url)) — \(.published_at[:10])\") | join(\"\n\")")
+            new_discussion "Monthly release summary — $(date -u +%B\ %Y)" \
+              "Releases since ${SINCE}:
+
+          ${RELS:-_none_}
+
+          _To stop these: unsubscribe from this category or adjust your Watch settings._"
+            echo "::notice::Monthly summary posted."
+          fi
