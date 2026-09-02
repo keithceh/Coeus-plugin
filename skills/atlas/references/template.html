@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Atlas</title>
+<!--
+  Coeus atlas render shell v1.0.0 — self-contained by contract.
+  No external scripts, stylesheets, fonts, images, or network fetches of any
+  kind — inline CSS and JS only, so the Phase-3 containment grep stays clean.
+  The generator copies this file and replaces the marked injection point below
+  with the contents of Outputs/atlas.json. Nothing else is edited.
+  Injection safety: the JSON must not contain the literal sequence </script>.
+-->
+<style>
+:root{
+  --bg:#ffffff; --fg:#1a1c22; --mut:#5c6270; --acc:#b07d00; --card:#f4f5f8;
+  --bd:#d8dbe3; --code:#eef0f4; --dim:0.18; --pin-parent:#1f6fd0; --pin-child:#d1651a;
+  --shadow:0 1px 2px rgba(0,0,0,.10);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0f1116; --fg:#e6e7ea; --mut:#9aa0a6; --acc:#f4b400; --card:#161922;
+    --bd:#262a36; --code:#0b0d12; --dim:0.16; --pin-parent:#7cb1ff; --pin-child:#ff9e5e;
+    --shadow:0 1px 2px rgba(0,0,0,.45);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);
+  font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+a{color:var(--acc)}
+button{font:inherit;color:inherit;background:var(--card);border:1px solid var(--bd);
+  border-radius:6px;padding:3px 9px;cursor:pointer}
+button:hover{border-color:var(--acc)}
+#err{display:none;padding:10px 16px;background:#7a1420;color:#fff;font-size:14px}
+#err.show{display:block}
+noscript div{padding:14px 16px;background:var(--card);border-bottom:1px solid var(--bd)}
+
+/* ---------- header strip ---------- */
+header{padding:14px 20px;border-bottom:1px solid var(--bd);background:var(--card)}
+header h1{margin:0 0 4px;font-size:19px;letter-spacing:.2px}
+header p{margin:0;color:var(--mut);font-size:14px;max-width:110ch}
+header .meta{margin-top:6px;font-size:12px;color:var(--mut)}
+header .tools{float:right;display:flex;gap:6px;align-items:center}
+header .tools input{font:inherit;font-size:13px;padding:4px 8px;border:1px solid var(--bd);
+  border-radius:6px;background:var(--bg);color:var(--fg);width:190px}
+
+/* ---------- 4 fixed regions ---------- */
+main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  grid-template-rows:auto minmax(360px,1fr);gap:12px;padding:12px;
+  grid-template-areas:"frame now" "map story"}
+#frame{grid-area:frame}#now{grid-area:now}#map{grid-area:map}#story{grid-area:story}
+@media (max-width:900px){
+  main{grid-template-columns:minmax(0,1fr);
+    grid-template-areas:"frame" "now" "map" "story"}
+}
+section.region{border:1px solid var(--bd);border-radius:10px;background:var(--card);
+  display:flex;flex-direction:column;min-width:0;overflow:hidden}
+section.region>h2{margin:0;padding:8px 12px;font-size:13px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--mut);border-bottom:1px solid var(--bd);
+  display:flex;justify-content:space-between;align-items:center;gap:8px}
+section.region>.body{padding:10px 12px;overflow:auto;min-height:0}
+#map>.body{padding:0;position:relative}
+h3{margin:12px 0 5px;font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut)}
+h3:first-child{margin-top:0}
+ul{margin:0;padding-left:18px}li{margin:2px 0}
+.muted{color:var(--mut)}
+.empty{color:var(--mut);font-style:italic}
+
+/* ---------- cards / disclosure (R15: summarised always, detail expands) ---------- */
+details.card{border:1px solid var(--bd);border-radius:8px;background:var(--bg);
+  margin:6px 0;box-shadow:var(--shadow)}
+details.card>summary{padding:7px 10px;cursor:pointer;list-style:none;display:block}
+details.card>summary::-webkit-details-marker{display:none}
+details.card>summary::after{content:"+";float:right;color:var(--mut)}
+details.card[open]>summary::after{content:"\2212"}
+details.card>.detail{padding:0 10px 9px;font-size:14px;border-top:1px solid var(--bd);margin-top:2px;padding-top:8px}
+.hit{outline:2px solid var(--acc);outline-offset:1px}
+@keyframes flashbg{0%{background:var(--acc)}100%{background:transparent}}
+.flash{animation:flashbg 1.1s ease-out}
+
+/* ---------- badges ---------- */
+.badge{display:inline-block;font-size:11.5px;padding:1px 7px;border-radius:999px;
+  border:1px solid var(--bd);background:var(--code);color:var(--mut);margin:0 4px 3px 0;
+  cursor:pointer;line-height:1.5}
+.badge.guard{border-style:dashed;border-color:var(--acc);color:var(--fg)}
+.badge.type{cursor:default;border-style:solid}
+.badge.type.fork{border-left:3px solid var(--fg)}
+.badge.type.failure{border-bottom:2px solid var(--fg)}
+.badge.type.decision{border-top:2px solid var(--fg)}
+.badge.delta{border-style:double;border-width:3px;color:var(--fg);cursor:default}
+
+/* ---------- story ---------- */
+ol.beats{list-style:none;margin:0;padding:0}
+ol.beats>li{position:relative;padding-left:18px;margin:0 0 8px}
+ol.beats>li::before{content:"";position:absolute;left:5px;top:6px;width:7px;height:7px;
+  border-radius:50%;background:var(--fg)}
+ol.beats>li::after{content:"";position:absolute;left:8px;top:16px;bottom:-8px;width:1px;
+  background:var(--bd)}
+ol.beats>li:last-child::after{display:none}
+ol.beats>li.branch{margin-left:20px;border-left:1px dashed var(--bd);padding-left:20px}
+ol.beats>li.branch::before{border-radius:0}
+.chain{font-size:13.5px}
+.chain b{font-weight:600}
+.chain .arrow{color:var(--mut);padding:0 3px}
+.beatdate{font-size:12px;color:var(--mut);float:right}
+
+/* ---------- map svg ---------- */
+#svgwrap{width:100%;height:100%;min-height:340px;overflow:hidden;cursor:grab;background:var(--bg)}
+#svgwrap.drag{cursor:grabbing}
+svg{width:100%;height:100%;display:block;touch-action:none}
+.grp-box{fill:none;stroke:var(--bd);stroke-width:1;stroke-dasharray:5 4;rx:10}
+.grp-label{fill:var(--mut);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+g.node rect.box{stroke-width:1.6;transition:none}
+g.node text.lbl{font-size:12.5px;font-weight:600;fill:var(--fg)}
+g.node text.kind{font-size:10.5px;fill:var(--mut);letter-spacing:.05em;text-transform:uppercase}
+g.node text.desc{font-size:11px;fill:var(--mut)}
+g.node{cursor:pointer;transform-box:fill-box;transform-origin:center}
+g.node:hover,g.node:focus{transform:scale(1.06)}
+g.node.pinned rect.box{stroke-width:3.2}
+g.node.parent rect.box{stroke:var(--pin-parent);stroke-width:3}
+g.node.child rect.box{stroke:var(--pin-child);stroke-width:3}
+/* A node can be BOTH a parent and a child of the pinned node (it feeds it and
+   is fed by it). Neither relation may be silently dropped: the box keeps the
+   parent hue, the kind line takes the child hue, and the underline is a
+   non-colour cue so the doubled relation survives monochrome (R10). */
+g.node.both rect.box{stroke:var(--pin-parent);stroke-width:3}
+g.node.both text.kind{fill:var(--pin-child);font-weight:700;
+  text-decoration:underline;text-decoration-thickness:1.5px}
+g.node.dim{opacity:var(--dim)}
+g.node.hit rect.box{stroke:var(--acc);stroke-width:3.4}
+path.edge{fill:none;stroke:var(--mut);stroke-width:1.3;marker-end:url(#arrow)}
+path.edge.parent{stroke:var(--pin-parent);stroke-width:2.2;marker-end:url(#arrowP)}
+path.edge.child{stroke:var(--pin-child);stroke-width:2.2;marker-end:url(#arrowC)}
+path.edge.dim{opacity:var(--dim)}
+text.verb{font-size:10.5px;fill:var(--fg)}
+rect.verbbg{fill:var(--bg);stroke:var(--bd);stroke-width:.8;rx:3}
+g.elab.dim{opacity:var(--dim)}
+.mapbar{position:absolute;right:8px;bottom:8px;display:flex;gap:5px;z-index:5}
+.maphint{position:absolute;left:10px;bottom:9px;font-size:11.5px;color:var(--mut);z-index:5}
+
+/* ---------- print ---------- */
+@media print{
+  :root{--bg:#fff;--fg:#000;--card:#fff;--bd:#999;--mut:#333;--dim:1}
+  body{font-size:11pt}
+  header .tools,.mapbar,.maphint{display:none}
+  main{display:block;padding:0}
+  section.region{break-inside:avoid;page-break-inside:avoid;margin:0 0 10px;border-color:#999}
+  details.card{border-color:#999}
+  details.card>.detail{display:block !important}
+  g.node.dim,path.edge.dim,g.elab.dim{opacity:1}
+  #svgwrap{height:auto;min-height:0;overflow:visible}
+  svg{height:520px}
+}
+</style>
+</head>
+<body>
+<div id="err" role="alert"></div>
+<noscript><div><strong>JavaScript is off.</strong> This atlas renders its map and
+story with inline script only — no network is involved. Enable scripting for this
+local file to read it.</div></noscript>
+
+<header>
+  <div class="tools">
+    <input id="q" type="search" placeholder="Search (2+ chars)" aria-label="Search the atlas">
+    <button id="clr" type="button">Clear</button>
+  </div>
+  <h1 id="title">Project Atlas</h1>
+  <p id="intent"></p>
+  <div class="meta" id="metaline"></div>
+</header>
+
+<main>
+  <section class="region" id="frame"><h2><span>1 &middot; Frame</span></h2><div class="body"></div></section>
+  <section class="region" id="now"><h2><span>2 &middot; Now</span></h2><div class="body"></div></section>
+  <section class="region" id="map"><h2><span>3 &middot; Map</span><span class="muted" id="mapnote"></span></h2>
+    <div class="body">
+      <div id="svgwrap"></div>
+      <div class="maphint">Drag to pan &middot; wheel to zoom &middot; click a node to pin</div>
+      <div class="mapbar">
+        <button id="zin" type="button" title="Zoom in">+</button>
+        <button id="zout" type="button" title="Zoom out">&minus;</button>
+        <button id="zfit" type="button" title="Fit">Fit</button>
+      </div>
+    </div>
+  </section>
+  <section class="region" id="story"><h2><span>4 &middot; Story</span><span class="muted">newest first</span></h2><div class="body"></div></section>
+</main>
+
+<script>
+window.onerror = function (m, s, l) {
+  var e = document.getElementById('err');
+  if (e) { e.className = 'show'; e.textContent = 'Atlas render error: ' + m + ' (line ' + l + '). The data above this point may be incomplete.'; }
+  return false;
+};
+</script>
+
+<script>
+/* ===== injected data ===== */
+const ATLAS = /*__ATLAS_DATA__*/{};
+/* ========================= */
+
+(function () {
+  'use strict';
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  var A = ATLAS || {};
+  var meta = A.meta || {}, frame = A.frame || {}, now = A.now || {},
+      map = A.map || {}, story = A.story || {}, layout = A.layout || {};
+  var nodes = map.nodes || [], edges = map.edges || [], groups = map.groups || [];
+  var beats = story.beats || [];
+
+  function el(tag, cls, txt) { var n = document.createElement(tag); if (cls) n.className = cls; if (txt != null) n.textContent = txt; return n; }
+  function sv(tag, attrs) { var n = document.createElementNS(SVGNS, tag); for (var k in attrs) { if (attrs[k] != null) n.setAttribute(k, attrs[k]); } return n; }
+  function txt(v, fb) { return (v == null || v === '') ? (fb || '') : String(v); }
+  function list(host, arr, empty) {
+    if (!arr || !arr.length) { host.appendChild(el('div', 'empty', empty)); return; }
+    var ul = el('ul');
+    arr.forEach(function (s) { ul.appendChild(el('li', null, typeof s === 'string' ? s : JSON.stringify(s))); });
+    host.appendChild(ul);
+  }
+  function deltaBadge(host, d) { if (d) host.appendChild(el('span', 'badge delta', d === 'new' ? 'new' : 'changed')); }
+
+  /* ---------------- header ---------------- */
+  document.getElementById('title').textContent = txt(meta.project, 'Project Atlas');
+  document.title = txt(meta.project, 'Project Atlas') + ' — Atlas';
+  document.getElementById('intent').textContent = txt(frame.intent, 'Intent not established from the sources.');
+  var srcs = (meta.sources || []).map(function (s) { return txt(s.kind, '?') + (s.path ? ' · ' + s.path : ''); });
+  document.getElementById('metaline').textContent =
+    'generated ' + txt(meta.generated, '?') + ' · atlas ' + txt(meta.atlas_version, '?') +
+    ' · ' + srcs.length + ' source' + (srcs.length === 1 ? '' : 's') + (srcs.length ? ': ' + srcs.join(' | ') : '');
+
+  /* ---------------- FRAME ---------------- */
+  (function () {
+    var b = document.querySelector('#frame .body');
+    b.appendChild(el('h3', null, 'In scope')); list(b, frame.scope_in, 'Not established.');
+    b.appendChild(el('h3', null, 'Out of scope')); list(b, frame.scope_out, 'Not established.');
+    b.appendChild(el('h3', null, 'Guardrails'));
+    var gs = frame.guardrails || [];
+    if (!gs.length) { b.appendChild(el('div', 'empty', 'None recorded.')); }
+    gs.forEach(function (g) {
+      var d = el('details', 'card'); d.id = 'guard-' + txt(g.id);
+      var s = el('summary'); s.appendChild(el('span', 'badge guard', txt(g.id)));
+      s.appendChild(document.createTextNode(txt(g.rule, 'Rule text missing.')));
+      d.appendChild(s);
+      var det = el('div', 'detail');
+      if (g.origin_beat) {
+        var lk = el('button', null, 'Origin: beat ' + g.origin_beat);
+        lk.addEventListener('click', function () { jumpTo('beat-' + g.origin_beat); });
+        det.appendChild(lk);
+      } else {
+        det.appendChild(el('span', 'muted', 'Origin beat not established (?) — recorded as unknown, not guessed.'));
+      }
+      d.appendChild(det); b.appendChild(d);
+    });
+    b.appendChild(el('h3', null, 'References'));
+    var rf = frame.references || [];
+    if (!rf.length) { b.appendChild(el('div', 'empty', 'None recorded.')); }
+    else {
+      var ul = el('ul');
+      rf.forEach(function (r) {
+        var li = el('li');
+        if (r.link) { var a = el('a', null, txt(r.label, r.link)); a.href = r.link; li.appendChild(a); }
+        else { li.textContent = txt(r.label, '?'); }
+        ul.appendChild(li);
+      });
+      b.appendChild(ul);
+    }
+  })();
+
+  /* ---------------- NOW ---------------- */
+  (function () {
+    var b = document.querySelector('#now .body');
+    if (now.recall_prompt) {
+      var d = el('details', 'card');
+      var s = el('summary'); s.appendChild(el('span', 'badge', 'optional'));
+      s.appendChild(document.createTextNode('Before you look — what do you think the current state is?'));
+      d.appendChild(s);
+      d.appendChild(el('div', 'detail', txt(now.recall_prompt)));
+      b.appendChild(d);
+    }
+    b.appendChild(el('h3', null, 'Where it stopped'));
+    var p = el('p', null, txt(now.position, 'Not established.')); p.style.margin = '0';
+    b.appendChild(p);
+    b.appendChild(el('div', 'muted', 'last touched ' + txt(now.last_touched, '?')));
+    b.appendChild(el('h3', null, 'Open threads')); list(b, now.open_threads, 'None recorded.');
+    b.appendChild(el('h3', null, 'Next')); list(b, now.next, 'None recorded.');
+  })();
+
+  /* ---------------- STORY ---------------- */
+  (function () {
+    var b = document.querySelector('#story .body');
+    if (!beats.length) { b.appendChild(el('div', 'empty', 'No history beats established from the sources.')); return; }
+    var ol = el('ol', 'beats');
+    beats.forEach(function (bt) {
+      var li = el('li', bt.branch ? 'branch' : null);
+      li.id = 'beat-' + txt(bt.id);
+      var d = el('details', 'card');
+      var s = el('summary');
+      if (bt.date) s.appendChild(el('span', 'beatdate', bt.date));
+      s.appendChild(el('span', 'badge type ' + txt(bt.type, 'milestone'), txt(bt.type, 'beat')));
+      if (bt.branch) s.appendChild(el('span', 'badge', 'branch: ' + bt.branch));
+      deltaBadge(s, bt.delta);
+      var chain = el('span', 'chain');
+      chain.appendChild(el('b', null, txt(bt.what, 'What: not established')));
+      chain.appendChild(el('span', 'arrow', ' → '));
+      chain.appendChild(document.createTextNode('because ' + txt(bt.why, 'why not established')));
+      chain.appendChild(el('span', 'arrow', ' → '));
+      chain.appendChild(document.createTextNode(txt(bt.outcome, 'outcome not established')));
+      s.appendChild(chain);
+      d.appendChild(s);
+      var det = el('div', 'detail');
+      if (bt.parent) {
+        var pb = el('button', null, 'Follows beat ' + bt.parent);
+        pb.addEventListener('click', function () { jumpTo('beat-' + bt.parent); });
+        det.appendChild(pb);
+      }
+      (bt.guardrails || []).forEach(function (gid) {
+        var gb = el('span', 'badge guard', 'guardrail ' + gid + ' → Frame');
+        gb.addEventListener('click', function () { jumpTo('guard-' + gid); });
+        det.appendChild(gb);
+      });
+      if (!bt.parent && !(bt.guardrails || []).length) det.appendChild(el('span', 'muted', 'No parent beat, no guardrail originated here.'));
+      d.appendChild(det); li.appendChild(d); ol.appendChild(li);
+    });
+    b.appendChild(ol);
+  })();
+
+  function jumpTo(id) {
+    var t = document.getElementById(id);
+    if (!t) return;
+    var det = t.tagName === 'DETAILS' ? t : t.querySelector('details');
+    if (det) det.open = true;
+    t.scrollIntoView({ block: 'center' });
+    t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash');
+  }
+
+  /* ---------------- MAP ---------------- */
+  var NW = 178, NH = 58, COLGAP = 118, ROWGAP = 26, PAD = 26;
+  var byId = {}, pos = {}, nodeG = {}, edgePaths = [], labelGs = [];
+  nodes.forEach(function (n) { byId[n.id] = n; });
+
+  var gOrder = (layout.group_order && layout.group_order.length)
+    ? layout.group_order.slice()
+    : groups.map(function (g) { return g.id; });
+  groups.forEach(function (g) { if (gOrder.indexOf(g.id) < 0) gOrder.push(g.id); });
+  var ungrouped = nodes.filter(function (n) { return gOrder.indexOf(n.group) < 0; });
+  if (ungrouped.length) gOrder.push('__ungrouped__');
+
+  var nOrder = (layout.node_order && layout.node_order.length) ? layout.node_order.slice() : [];
+  nodes.forEach(function (n) { if (nOrder.indexOf(n.id) < 0) nOrder.push(n.id); });
+  function orderIdx(id) { var i = nOrder.indexOf(id); return i < 0 ? 1e6 : i; }
+
+  // Hue assignment (R10). An EXPLICIT null in layout.hues means "neutral" —
+  // this group is deliberately uncoloured and renders grey, which is how a
+  // natural grouping of six survives the five-hue budget without two groups
+  // silently sharing a hue. A group with no entry at all is a data gap, not a
+  // choice, so it still falls back to the cycle.
+  var hues = layout.hues || {};
+  var HFALL = [205, 35, 145, 280, 0];
+  var NEUTRAL = {};
+  gOrder.forEach(function (gid, i) {
+    if (Object.prototype.hasOwnProperty.call(hues, gid) && hues[gid] === null) { NEUTRAL[gid] = 1; return; }
+    if (hues[gid] == null) hues[gid] = HFALL[i % HFALL.length];
+  });
+  function hueOf(gid) { return hues[gid] != null ? hues[gid] : 205; }
+  function grpStroke(gid) { return NEUTRAL[gid] ? 'var(--mut)' : 'hsl(' + hueOf(gid) + ',45%,50%)'; }
+  function nodeFill(gid) { return NEUTRAL[gid] ? 'var(--code)' : 'hsla(' + hueOf(gid) + ',42%,50%,0.13)'; }
+  function nodeStroke(gid) { return NEUTRAL[gid] ? 'var(--mut)' : 'hsl(' + hueOf(gid) + ',48%,45%)'; }
+
+  // Deterministic layered layout: one column per group (group_order), rows by node_order.
+  var cols = gOrder.map(function (gid) {
+    var mem = nodes.filter(function (n) { return (gid === '__ungrouped__') ? (gOrder.indexOf(n.group) < 0 || n.group == null) : n.group === gid; });
+    mem.sort(function (a, b) { return orderIdx(a.id) - orderIdx(b.id); });
+    return { id: gid, label: (groups.filter(function (g) { return g.id === gid; })[0] || {}).label || (gid === '__ungrouped__' ? 'Ungrouped' : gid), members: mem };
+  }).filter(function (c) { return c.members.length; });
+
+  var maxRows = cols.reduce(function (m, c) { return Math.max(m, c.members.length); }, 0);
+  var W = PAD * 2 + cols.length * NW + Math.max(0, cols.length - 1) * COLGAP;
+  var H = PAD * 2 + 26 + maxRows * NH + Math.max(0, maxRows - 1) * ROWGAP;
+  cols.forEach(function (c, ci) {
+    var x = PAD + ci * (NW + COLGAP);
+    c.x = x; c.y = PAD + 26;
+    c.members.forEach(function (n, ri) { pos[n.id] = { x: x, y: c.y + ri * (NH + ROWGAP) }; });
+    c.h = c.members.length * NH + Math.max(0, c.members.length - 1) * ROWGAP;
+  });
+
+  var svg = sv('svg', { viewBox: '0 0 ' + W + ' ' + H, preserveAspectRatio: 'xMidYMid meet', role: 'img' });
+  var defs = sv('defs');
+  [['arrow', 'var(--mut)'], ['arrowP', 'var(--pin-parent)'], ['arrowC', 'var(--pin-child)']].forEach(function (a) {
+    var m = sv('marker', { id: a[0], viewBox: '0 0 8 8', refX: 7, refY: 4, markerWidth: 7, markerHeight: 7, orient: 'auto-start-reverse' });
+    m.appendChild(sv('path', { d: 'M0,0 L8,4 L0,8 z', fill: a[1] }));
+    defs.appendChild(m);
+  });
+  svg.appendChild(defs);
+  var root = sv('g', { id: 'root' });
+  svg.appendChild(root);
+  var gLayerBox = sv('g'), gLayerEdge = sv('g'), gLayerLbl = sv('g'), gLayerNode = sv('g');
+  root.appendChild(gLayerBox); root.appendChild(gLayerEdge); root.appendChild(gLayerLbl); root.appendChild(gLayerNode);
+
+  // enclosure boxes (R7: common region = chunk boundary; label sits on the box, no legend)
+  cols.forEach(function (c) {
+    var pad = 12;
+    gLayerBox.appendChild(sv('rect', { class: 'grp-box', x: c.x - pad, y: c.y - pad - 16, width: NW + pad * 2, height: c.h + pad * 2 + 16, rx: 10,
+      stroke: grpStroke(c.id) }));
+    var t = sv('text', { class: 'grp-label', x: c.x - pad + 6, y: c.y - pad - 4 });
+    t.textContent = c.label; gLayerBox.appendChild(t);
+  });
+
+  function kindShape(kind) {
+    // Redundant, non-colour encoding of kind (R10). One rx per kind and no two
+    // kinds share a value — a shared shape would make the redundant channel
+    // ambiguous exactly where colour is already carrying the group.
+    switch (kind) {
+      case 'output': return 0;      // square
+      case 'external': return 4;    // barely rounded
+      case 'input': return 14;      // strongly rounded
+      case 'reference': return 20;  // rounder still
+      case 'person': return 26;     // stadium
+      default: return 8;            // artifact
+    }
+  }
+  function statusDash(st) {
+    if (st === 'superseded') return '7 4';
+    if (st === 'draft') return '2 3';
+    if (st === 'unknown') return '9 3 2 3';
+    return null;
+  }
+
+  nodes.forEach(function (n) {
+    var p = pos[n.id]; if (!p) return;
+    // outer <g> carries the translate; inner <g class="node"> carries the CSS
+    // hover scale — a CSS transform on the same element would override the
+    // presentation attribute and throw the node back to the origin.
+    var outer = sv('g', { transform: 'translate(' + p.x + ',' + p.y + ')' });
+    var g = sv('g', { class: 'node', 'data-id': n.id, tabindex: '0' });
+    var r = sv('rect', {
+      class: 'box', x: 0, y: 0, width: NW, height: NH, rx: kindShape(n.kind),
+      fill: nodeFill(n.group), stroke: nodeStroke(n.group),
+      'stroke-dasharray': statusDash(n.status)
+    });
+    g.appendChild(r);
+    var lbl = sv('text', { class: 'lbl', x: 9, y: 17 });
+    var name = txt(n.label, '?') + (n.status === 'unknown' && !/\?\s*$/.test(txt(n.label)) ? ' ?' : '');
+    lbl.textContent = name.length > 26 ? name.slice(0, 25) + '…' : name;
+    g.appendChild(lbl);
+    var kd = sv('text', { class: 'kind', x: 9, y: 31 });
+    kd.textContent = txt(n.kind, 'artifact') + ' · ' + txt(n.status, 'active') + (n.delta ? ' · ' + n.delta : '');
+    g.appendChild(kd);
+    var ds = sv('text', { class: 'desc', x: 9, y: 46 });
+    var dtxt = txt(n.desc, '');
+    ds.textContent = dtxt.length > 34 ? dtxt.slice(0, 33) + '…' : dtxt;
+    g.appendChild(ds);
+    var ttl = sv('title');
+    ttl.textContent = txt(n.label) + ' — ' + txt(n.kind) + '/' + txt(n.status) + (dtxt ? '\n' + dtxt : '') + (n.link ? '\n' + n.link : '');
+    g.appendChild(ttl);
+    g.addEventListener('click', function (ev) { ev.stopPropagation(); pin(n.id); });
+    g.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); pin(n.id); } });
+    outer.appendChild(g);
+    gLayerNode.appendChild(outer);
+    nodeG[n.id] = g;
+  });
+
+  function colOf(id) { var n = byId[id]; if (!n) return 0; for (var i = 0; i < cols.length; i++) { if (cols[i].members.indexOf(n) >= 0) return i; } return 0; }
+
+  edges.forEach(function (e) {
+    var a = pos[e.from], b = pos[e.to]; if (!a || !b) return;
+    var ca = colOf(e.from), cb = colOf(e.to), d;
+    var ay = a.y + NH / 2, by = b.y + NH / 2;
+    if (cb > ca) { var x1 = a.x + NW, x2 = b.x, dx = (x2 - x1) * 0.5; d = 'M' + x1 + ',' + ay + ' C' + (x1 + dx) + ',' + ay + ' ' + (x2 - dx) + ',' + by + ' ' + x2 + ',' + by; }
+    else if (cb < ca) { var x3 = a.x, x4 = b.x + NW, dx2 = (x3 - x4) * 0.5; d = 'M' + x3 + ',' + ay + ' C' + (x3 - dx2) + ',' + ay + ' ' + (x4 + dx2) + ',' + by + ' ' + x4 + ',' + by; }
+    else { var x5 = a.x + NW, off = 46 + Math.abs(by - ay) * 0.25; d = 'M' + x5 + ',' + ay + ' C' + (x5 + off) + ',' + ay + ' ' + (x5 + off) + ',' + by + ' ' + (b.x + NW) + ',' + by; }
+    var p = sv('path', { class: 'edge', d: d, 'data-from': e.from, 'data-to': e.to });
+    if (e.delta) p.setAttribute('stroke-dasharray', '6 3');
+    gLayerEdge.appendChild(p);
+    edgePaths.push(p);
+    // verb ON the edge (R1 contiguity, R3 labeled relations) — never a legend
+    var lg = sv('g', { class: 'elab', 'data-from': e.from, 'data-to': e.to });
+    var bg = sv('rect', { class: 'verbbg' });
+    var tv = sv('text', { class: 'verb', 'text-anchor': 'middle' });
+    tv.textContent = txt(e.verb, 'RELATION?');
+    lg.appendChild(bg); lg.appendChild(tv);
+    gLayerLbl.appendChild(lg);
+    labelGs.push({ g: lg, bg: bg, t: tv, path: p });
+  });
+
+  document.getElementById('svgwrap').appendChild(svg);
+
+  labelGs.forEach(function (L) {
+    var pt;
+    try { pt = L.path.getPointAtLength(L.path.getTotalLength() / 2); } catch (err) { pt = null; }
+    if (!pt) { var m = /M([-\d.]+),([-\d.]+)/.exec(L.path.getAttribute('d')) || [0, 0, 0]; pt = { x: +m[1] + 40, y: +m[2] }; }
+    L.t.setAttribute('x', pt.x); L.t.setAttribute('y', pt.y + 3.5);
+    var w = Math.max(24, L.t.textContent.length * 5.9 + 8);
+    L.bg.setAttribute('x', pt.x - w / 2); L.bg.setAttribute('y', pt.y - 8);
+    L.bg.setAttribute('width', w); L.bg.setAttribute('height', 15);
+  });
+
+  document.getElementById('mapnote').textContent = nodes.length + ' nodes · ' + edges.length + ' edges · ' + cols.length + ' groups';
+
+  /* ---- pan + zoom ---- */
+  var vx = 0, vy = 0, vz = 1;
+  function applyView() { root.setAttribute('transform', 'translate(' + vx + ',' + vy + ') scale(' + vz + ')'); }
+  var wrap = document.getElementById('svgwrap');
+  wrap.addEventListener('wheel', function (ev) {
+    ev.preventDefault();
+    var f = ev.deltaY < 0 ? 1.12 : 1 / 1.12, nz = Math.min(4, Math.max(0.25, vz * f));
+    var r = svg.getBoundingClientRect(), sx = (ev.clientX - r.left) / r.width * W, sy = (ev.clientY - r.top) / r.height * H;
+    vx = sx - (sx - vx) * (nz / vz); vy = sy - (sy - vy) * (nz / vz); vz = nz; applyView();
+  }, { passive: false });
+  var dragging = false, lx = 0, ly = 0;
+  wrap.addEventListener('pointerdown', function (ev) { dragging = true; lx = ev.clientX; ly = ev.clientY; wrap.className = 'drag'; wrap.setPointerCapture(ev.pointerId); });
+  wrap.addEventListener('pointermove', function (ev) {
+    if (!dragging) return;
+    var r = svg.getBoundingClientRect();
+    vx += (ev.clientX - lx) * (W / r.width); vy += (ev.clientY - ly) * (H / r.height);
+    lx = ev.clientX; ly = ev.clientY; applyView();
+  });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (t) {
+    wrap.addEventListener(t, function () { dragging = false; wrap.className = ''; });
+  });
+  document.getElementById('zin').addEventListener('click', function () { vz = Math.min(4, vz * 1.2); applyView(); });
+  document.getElementById('zout').addEventListener('click', function () { vz = Math.max(0.25, vz / 1.2); applyView(); });
+  document.getElementById('zfit').addEventListener('click', function () { vx = 0; vy = 0; vz = 1; applyView(); });
+  svg.addEventListener('click', function () { pin(null); });
+
+  function centreOn(id) {
+    var p = pos[id]; if (!p) return;
+    vz = Math.max(vz, 1);
+    vx = W / 2 - (p.x + NW / 2) * vz; vy = H / 2 - (p.y + NH / 2) * vz; applyView();
+  }
+
+  /* ---- click-to-pin: parents one hue, children another, rest dimmed ---- */
+  var pinned = null;
+  function pin(id) {
+    pinned = (pinned === id) ? null : id;
+    var par = {}, chi = {};
+    if (pinned) {
+      edges.forEach(function (e) { if (e.to === pinned) par[e.from] = 1; if (e.from === pinned) chi[e.to] = 1; });
+    }
+    Object.keys(nodeG).forEach(function (nid) {
+      var g = nodeG[nid], c = 'node';
+      if (pinned) {
+        if (nid === pinned) c += ' pinned';
+        else if (par[nid] && chi[nid]) c += ' parent child both';
+        else if (par[nid]) c += ' parent';
+        else if (chi[nid]) c += ' child';
+        else c += ' dim';
+      }
+      g.setAttribute('class', c);
+    });
+    edgePaths.forEach(function (p) {
+      var f = p.getAttribute('data-from'), t = p.getAttribute('data-to'), c = 'edge';
+      if (pinned) {
+        if (t === pinned) c += ' parent'; else if (f === pinned) c += ' child'; else c += ' dim';
+      }
+      p.setAttribute('class', c);
+    });
+    labelGs.forEach(function (L) {
+      var f = L.g.getAttribute('data-from'), t = L.g.getAttribute('data-to');
+      L.g.setAttribute('class', 'elab' + (pinned && f !== pinned && t !== pinned ? ' dim' : ''));
+    });
+    if (pinned) centreOn(pinned);
+  }
+
+  /* ---- search: >=2 chars, jump + highlight across all four regions ---- */
+  var qEl = document.getElementById('q');
+  function clearHits() {
+    Array.prototype.forEach.call(document.querySelectorAll('.hit'), function (n) { n.classList.remove('hit'); });
+    Object.keys(nodeG).forEach(function (nid) { nodeG[nid].classList.remove('hit'); });
+  }
+  function search() {
+    var q = qEl.value.trim().toLowerCase();
+    clearHits();
+    if (q.length < 2) return;
+    var first = null;
+    nodes.forEach(function (n) {
+      var hay = (txt(n.label) + ' ' + txt(n.desc) + ' ' + txt(n.kind) + ' ' + txt(n.group)).toLowerCase();
+      if (hay.indexOf(q) >= 0 && nodeG[n.id]) { nodeG[n.id].classList.add('hit'); if (!first) first = n.id; }
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('details.card'), function (d) {
+      if (d.textContent.toLowerCase().indexOf(q) >= 0) { d.classList.add('hit'); d.open = true; }
+    });
+    if (first) centreOn(first);
+    else {
+      var h = document.querySelector('details.card.hit');
+      if (h) h.scrollIntoView({ block: 'center' });
+    }
+  }
+  qEl.addEventListener('input', search);
+  document.getElementById('clr').addEventListener('click', function () { qEl.value = ''; clearHits(); });
+
+  // Print: nothing that matters may be hidden on paper (R15). Expand every card.
+  if (window.matchMedia) {
+    var mq = window.matchMedia('print');
+    if (mq.addEventListener) mq.addEventListener('change', function (e) { if (e.matches) openAll(); });
+  }
+  window.addEventListener('beforeprint', openAll);
+  function openAll() { Array.prototype.forEach.call(document.querySelectorAll('details.card'), function (d) { d.open = true; }); }
+})();
+</script>
+</body>
+</html>
