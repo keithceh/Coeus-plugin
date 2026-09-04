@@ -800,20 +800,29 @@ const ATLAS = /*__ATLAS_DATA__*/{};
       var sx = (ev.clientX - r.left) / (r.width || OVW) * OVW, sy = (ev.clientY - r.top) / (r.height || OVH) * OVH;
       vx = sx - (sx - vx) * (nz / vz); vy = sy - (sy - vy) * (nz / vz); vz = nz; applyView();
     }, { passive: false });
-    var dragging = false, lx = 0, ly = 0;
+    /* Capture the pointer only once a DRAG is real (movement past 4px).
+       Capturing on pointerdown retargets the subsequent click to the wrap,
+       so group boxes never receive real mouse clicks — synthetic
+       dispatchEvent(click) still works, which is exactly how tests can pass
+       while a human's click does nothing. Do not "simplify" this back. */
+    var pressed = false, dragging = false, lx = 0, ly = 0;
     wrap.addEventListener('pointerdown', function (ev) {
-      dragging = true; moved = 0; lx = ev.clientX; ly = ev.clientY; wrap.className = 'drag';
-      if (wrap.setPointerCapture) { try { wrap.setPointerCapture(ev.pointerId); } catch (err) {} }
+      pressed = true; dragging = false; moved = 0; lx = ev.clientX; ly = ev.clientY;
     });
     wrap.addEventListener('pointermove', function (ev) {
-      if (!dragging) return;
-      var r = ovSvg.getBoundingClientRect();
+      if (!pressed) return;
       moved += Math.abs(ev.clientX - lx) + Math.abs(ev.clientY - ly);
+      if (!dragging) {
+        if (moved <= 4) { lx = ev.clientX; ly = ev.clientY; return; }
+        dragging = true; wrap.className = 'drag';
+        if (wrap.setPointerCapture) { try { wrap.setPointerCapture(ev.pointerId); } catch (err) {} }
+      }
+      var r = ovSvg.getBoundingClientRect();
       vx += (ev.clientX - lx) * (OVW / (r.width || OVW)); vy += (ev.clientY - ly) * (OVH / (r.height || OVH));
       lx = ev.clientX; ly = ev.clientY; applyView();
     });
     ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (t) {
-      wrap.addEventListener(t, function () { dragging = false; wrap.className = ''; });
+      wrap.addEventListener(t, function () { pressed = false; dragging = false; wrap.className = ''; });
     });
     document.getElementById('zin').addEventListener('click', function () { vz = Math.min(4, vz * 1.2); applyView(); });
     document.getElementById('zout').addEventListener('click', function () { vz = Math.max(0.25, vz / 1.2); applyView(); });

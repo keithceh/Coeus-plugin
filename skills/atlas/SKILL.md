@@ -1,6 +1,6 @@
 ---
 name: atlas
-version: 1.2.0
+version: 1.2.1
 argument-hint: "[create|refresh|interview] [optional project path]"
 description: >-
   Trigger on: /coeus:atlas, "project atlas", "project map", "project at a glance", "visualise this project", "visualize this project", "explain this project visually", "map my project". Builds one self-contained interactive HTML atlas of any project (coding or not): intent, scope, artifact map, causal history, guardrails, re-entry state. Fires only for a visual overview OF A PROJECT — never for DUG lineage, session resume or handover, or document structuring.
@@ -156,8 +156,11 @@ not the delegation, is the deliverable.
    the member panel with the right member count; a node click opens the ego view
    with the right parent/child counts; List carries every edge as at least one
    chip; Grid's cells sum to the edge count and its diagonal equals the
-   intra-group counts; all three toggles and search work. Fix the *data* and
-   re-render; the shell is not edited to pass a check.
+   intra-group counts; all three toggles and search work. **Drive clicks with
+   real pointer input where the runner supports it (Playwright mouse), never
+   only `dispatchEvent`** — synthetic clicks bypass pointer capture and can
+   pass while a human's click does nothing (the v1.2.0 pan-capture bug). Fix
+   the *data* and re-render; the shell is not edited to pass a check.
 5. **Council review — gated.** Only on explicit request: launch
    `Skill(skill="coeus:llm-council", args="<the atlas + its sources>")` to
    stress-test the *claims* the atlas makes. Skip silently otherwise.

@@ -20,4 +20,4 @@ BSL 1.1 (until 2028-05-28) -> Apache 2.0. See LICENSE for full terms.
 Synced automatically from the source repo on every tagged release.
 File issues at https://github.com/keithceh/Coeus -- not here.
 
-Tag: v3.23.0
+Tag: v3.23.1

@@ -238,6 +238,12 @@ Map views (all three render from the one model):
 - [ ] **Grid** renders its empty cells visibly; the diagonal equals the
       intra-group counts and the cells sum to the edge total.
 - [ ] The **ego view** labels every edge it draws, on both sides.
+- [ ] Drill-in works under **real pointer input** — a genuine mouse click on a
+      group box opens the member panel, and on a member row opens the ego view.
+      *Never verify this with `dispatchEvent(click)` alone: synthetic clicks
+      bypass pointer capture, so they pass while a human's click does nothing —
+      the v1.2.0 pan-capture bug (pointer captured on pointerdown retargets the
+      click to the wrapper; capture must wait for real drag movement).*
 - [ ] No full node-link graph and no in-place group expansion. *Rationale: an
       expansion that contains a hub's targets reproduces exactly the full-graph
       occlusion it was meant to escape — established empirically on this repo's

@@ -2,6 +2,19 @@
 
 ---
 
+## 2026-Sep-04 (v3.23.1) · 2026-Sep-04 06:02 · atlas v1.2.1 — fix: Overview drill-in dead to real mouse clicks (pointer-capture bug)
+
+### Fixed — group boxes never received a human's click; member panel and ego view unreachable from the Overview
+User-reported: clicking a group box in the Map's Overview did nothing, so the member panel → ego view drill-in was unreachable by mouse. Root cause: the pan handler called `setPointerCapture` on **pointerdown**, unconditionally — once the wrapper captures the pointer, the browser retargets the subsequent `click` to the capturing element, so `g.gbox`'s click handler never fired on real input. Shipped in v3.22.0 and v3.23.0. **Why every test passed anyway:** the browser-leg tests drove clicks with synthetic `dispatchEvent(new MouseEvent('click'))`, which bypasses pointer capture entirely. Reproduced with real Playwright mouse input (fails on both 1280px and 420px viewports), then fixed: capture now waits until an actual drag is detected (movement > 4px); a plain click or a 2px human-wobble click reaches the group box, a real drag still pans and still does not misfire as a click. A code comment marks the trap ("do not simplify this back").
+
+### Doctrine — the lesson is now load-bearing
+SKILL.md Phase-3 render check and the design_rules Review Checklist both now require drill-in verification under **real pointer input** where the runner supports it — never `dispatchEvent` alone.
+
+### Validation
+Real-mouse probes: click → member panel → ego view pass at 1280px and 420px; jitter-click (2px) opens; drag pans without opening. jsdom smoke 152/152; `build-plugin.py --check-only` CHECK PASS 17 skills; `coeus_full_test.py` ALL TESTS PASS. atlas 1.2.1, plugin.json 3.23.1, registry row updated.
+
+---
+
 ## 2026-Sep-04 (v3.23.0) · 2026-Sep-04 05:48 · atlas v1.2.0 — Master of Content + evergreen create/refresh gate
 
 ### Added — `Outputs/atlas_moc.md`: a Master of Content, the atlas's third output
