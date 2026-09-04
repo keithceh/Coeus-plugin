@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Project Atlas</title>
 <!--
-  Coeus atlas render shell v1.0.0 — self-contained by contract.
+  Coeus atlas render shell v1.1.0 — self-contained by contract.
   No external scripts, stylesheets, fonts, images, or network fetches of any
   kind — inline CSS and JS only, so the Phase-3 containment grep stays clean.
   The generator copies this file and replaces the marked injection point below
@@ -16,15 +16,33 @@
 :root{
   --bg:#ffffff; --fg:#1a1c22; --mut:#5c6270; --acc:#b07d00; --card:#f4f5f8;
   --bd:#d8dbe3; --code:#eef0f4; --dim:0.18; --pin-parent:#1f6fd0; --pin-child:#d1651a;
-  --shadow:0 1px 2px rgba(0,0,0,.10);
+  --shadow:0 1px 2px rgba(0,0,0,.10); --scrim:rgba(20,22,28,.42);
+  /* ---- group palette: a FIXED, VALIDATED five-slot categorical set ----
+     Slots are assigned by layout.group_order POSITION, never by a hue angle
+     in the data. Both modes are selected sets, not one flipped into the
+     other. Validated on the adjacent pairlist against these surfaces: worst
+     adjacent CVD dE 9.1 light / 8.4 dark, normal-vision dE 19.6 / 19.3.
+     Colour is never the only channel — kind keeps its corner radius and
+     status keeps its border dash, so the map still reads in monochrome. */
+  --g1:#2a78d6; --g2:#eb6834; --g3:#1baf7a; --g4:#eda100; --g5:#e87ba4;
+  --g1f:rgba(42,120,214,.13); --g2f:rgba(235,104,52,.13); --g3f:rgba(27,175,122,.13);
+  --g4f:rgba(237,161,0,.13);  --g5f:rgba(232,123,164,.13);
 }
 @media (prefers-color-scheme: dark){
   :root{
     --bg:#0f1116; --fg:#e6e7ea; --mut:#9aa0a6; --acc:#f4b400; --card:#161922;
     --bd:#262a36; --code:#0b0d12; --dim:0.16; --pin-parent:#7cb1ff; --pin-child:#ff9e5e;
-    --shadow:0 1px 2px rgba(0,0,0,.45);
+    --shadow:0 1px 2px rgba(0,0,0,.45); --scrim:rgba(0,0,0,.60);
+    --g1:#3987e5; --g2:#d95926; --g3:#199e70; --g4:#c98500; --g5:#d55181;
+    --g1f:rgba(57,135,229,.18); --g2f:rgba(217,89,38,.18); --g3f:rgba(25,158,112,.18);
+    --g4f:rgba(201,133,0,.18);  --g5f:rgba(213,81,129,.18);
   }
 }
+/* One class per slot; .gsN is the reserved neutral for a "hue": null group.
+   Everything downstream reads --gs / --gf and never a raw colour. */
+.gs1{--gs:var(--g1);--gf:var(--g1f)} .gs2{--gs:var(--g2);--gf:var(--g2f)}
+.gs3{--gs:var(--g3);--gf:var(--g3f)} .gs4{--gs:var(--g4);--gf:var(--g4f)}
+.gs5{--gs:var(--g5);--gf:var(--g5f)} .gsN{--gs:var(--mut);--gf:var(--code)}
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);
   font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
@@ -105,52 +123,129 @@ ol.beats>li.branch::before{border-radius:0}
 .chain .arrow{color:var(--mut);padding:0 3px}
 .beatdate{font-size:12px;color:var(--mut);float:right}
 
-/* ---------- map svg ---------- */
+/* ---------- map: three views ----------
+   Overview (group-level, default) · List (relation tree) · Grid (group matrix).
+   The full node-link graph is deliberately NOT a view: at hub scale it occludes
+   itself. See design_rules.md §Bake-off addendum. */
+.viewbar{display:flex;gap:0;border:1px solid var(--bd);border-radius:7px;overflow:hidden}
+.viewbar button{border:0;border-radius:0;background:var(--bg);color:var(--mut);
+  padding:2px 10px;font-size:12px;border-right:1px solid var(--bd)}
+.viewbar button:last-child{border-right:0}
+.viewbar button[aria-pressed="true"]{background:var(--code);color:var(--fg);font-weight:650;
+  box-shadow:inset 0 -2px 0 var(--acc)}
+.viewbar button:hover{color:var(--fg)}
+.view{display:none;height:100%;min-height:0}
+.view.on{display:block}
+#v-list,#v-grid{overflow:auto;padding:10px 12px}
+
 #svgwrap{width:100%;height:100%;min-height:340px;overflow:hidden;cursor:grab;background:var(--bg)}
 #svgwrap.drag{cursor:grabbing}
 svg{width:100%;height:100%;display:block;touch-action:none}
-.grp-box{fill:none;stroke:var(--bd);stroke-width:1;stroke-dasharray:5 4;rx:10}
-.grp-label{fill:var(--mut);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
-g.node rect.box{stroke-width:1.6;transition:none}
-g.node text.lbl{font-size:12.5px;font-weight:600;fill:var(--fg)}
-g.node text.kind{font-size:10.5px;fill:var(--mut);letter-spacing:.05em;text-transform:uppercase}
-g.node text.desc{font-size:11px;fill:var(--mut)}
-g.node{cursor:pointer;transform-box:fill-box;transform-origin:center}
-g.node:hover,g.node:focus{transform:scale(1.06)}
-g.node.pinned rect.box{stroke-width:3.2}
-g.node.parent rect.box{stroke:var(--pin-parent);stroke-width:3}
-g.node.child rect.box{stroke:var(--pin-child);stroke-width:3}
-/* A node can be BOTH a parent and a child of the pinned node (it feeds it and
-   is fed by it). Neither relation may be silently dropped: the box keeps the
-   parent hue, the kind line takes the child hue, and the underline is a
-   non-colour cue so the doubled relation survives monochrome (R10). */
-g.node.both rect.box{stroke:var(--pin-parent);stroke-width:3}
-g.node.both text.kind{fill:var(--pin-child);font-weight:700;
-  text-decoration:underline;text-decoration-thickness:1.5px}
-g.node.dim{opacity:var(--dim)}
-g.node.hit rect.box{stroke:var(--acc);stroke-width:3.4}
-path.edge{fill:none;stroke:var(--mut);stroke-width:1.3;marker-end:url(#arrow)}
-path.edge.parent{stroke:var(--pin-parent);stroke-width:2.2;marker-end:url(#arrowP)}
-path.edge.child{stroke:var(--pin-child);stroke-width:2.2;marker-end:url(#arrowC)}
-path.edge.dim{opacity:var(--dim)}
-text.verb{font-size:10.5px;fill:var(--fg)}
-rect.verbbg{fill:var(--bg);stroke:var(--bd);stroke-width:.8;rx:3}
-g.elab.dim{opacity:var(--dim)}
+
+/* -- Overview: group enclosures + one aggregated edge per ordered pair -- */
+g.gbox{cursor:pointer}
+g.gbox rect.shell{stroke:var(--gs,var(--bd));stroke-width:2;fill:var(--gf,var(--card));
+  stroke-dasharray:6 4}
+g.gbox:hover rect.shell,g.gbox:focus rect.shell{stroke-width:3.4}
+g.gbox.hit rect.shell{stroke:var(--acc);stroke-width:3.6;stroke-dasharray:none}
+g.gbox text.gname{font-size:13px;font-weight:650;fill:var(--fg)}
+g.gbox text.gcount{font-size:12px;fill:var(--mut)}
+g.gbox text.gteaser,g.gbox text.gintra{font-size:11.5px;fill:var(--mut)}
+g.gbox text.gopen{font-size:11px;fill:var(--mut);letter-spacing:.06em;text-transform:uppercase}
+path.agg{fill:none;stroke:var(--mut);marker-end:url(#arrow)}
+text.agglbl{font-size:11.5px;fill:var(--fg)}
+rect.agglblbg{fill:var(--bg);stroke:var(--bd);stroke-width:.8;rx:3}
+g.agglab.hit rect.agglblbg{stroke:var(--acc);stroke-width:2}
+
+/* -- Grid: N x N group matrix. Empty cells stay VISIBLE as faint outlines;
+      the directions that carry nothing are as informative as the ones that do. */
+rect.cell{stroke:var(--bd);stroke-width:1}
+rect.cell.empty{fill:none;stroke-dasharray:3 3;opacity:.55}
+rect.cell.full{fill:var(--g1)}
+rect.cell.diag{stroke:var(--fg);stroke-width:1.6}
+g.gcell text.cn{font-size:14px;font-weight:650;fill:var(--fg)}
+g.gcell text.cv{font-size:10px;fill:var(--mut)}
+g.gcell.hit rect.cell{stroke:var(--acc);stroke-width:2.6}
+text.axlbl{font-size:11.5px;fill:var(--fg)}
+text.axcap{font-size:10.5px;fill:var(--mut);letter-spacing:.07em;text-transform:uppercase}
+rect.axswatch{stroke:var(--gs,var(--bd));fill:var(--gf,var(--code));stroke-width:1.6}
+rect.axswatch.hit{stroke:var(--acc);stroke-width:2.6}
+
+/* -- List: the relation tree. Zero SVG; this is the print form. -- */
+.tgroup{border-left:5px solid var(--gs,var(--mut));padding:2px 0 2px 12px;margin:0 0 16px}
+.tgroup>h4{margin:0 0 1px;font-size:13.5px}
+.tgroup>.ghint{margin:0 0 6px;font-size:11.5px;color:var(--mut)}
+.trow{padding:5px 6px 6px 8px;border-top:1px solid var(--bd);scroll-margin-top:60px}
+.trow:last-child{border-bottom:1px solid var(--bd)}
+.trow .head,.mlist .head{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}
+.trow .nm,.mlist .nm{font-weight:650;font-size:13.5px}
+.trow .rdesc{color:var(--mut);font-size:12px;flex:1 1 24ch;min-width:0}
+.mlist .rdesc{color:var(--mut);font-size:12px;margin-top:2px}
+.rels{margin:4px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:4px}
+.rchip{font:inherit;font-size:11.5px;line-height:1.5;padding:0 8px 1px;border-radius:999px;
+  border:1px solid var(--bd);background:var(--code);color:var(--fg);cursor:pointer;text-align:left}
+.rchip:hover{border-color:var(--acc)}
+.rchip.inbound{border-style:dashed}
+.rchip .vb{color:var(--mut);font-style:italic;padding:0 3px}
+.norel{font-size:11.5px;color:var(--mut);font-style:italic}
+/* kind = corner radius, status = border dash: the two non-colour channels, kept
+   identical in meaning to the SVG views so the List is not a second language */
+.kchip{display:inline-block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+  padding:0 7px;border:1px solid var(--fg);background:var(--code);color:var(--fg);line-height:1.6}
+.kchip.k-artifact{border-radius:4px} .kchip.k-external{border-radius:1px}
+.kchip.k-reference{border-radius:12px} .kchip.k-output{border-radius:0}
+.kchip.k-input{border-radius:8px} .kchip.k-person{border-radius:999px;border-style:double;border-width:3px}
+.sdash{display:inline-block;font-size:11px;color:var(--mut);border-bottom:2px solid var(--mut);padding-bottom:1px}
+.sdash.st-unknown{border-bottom-style:dashed} .sdash.st-draft{border-bottom-style:dotted}
+.sdash.st-superseded{border-bottom-style:double}
+
+/* -- drill-in overlays: member panel and ego view -- */
+#scrim{position:fixed;inset:0;background:var(--scrim);z-index:40;display:none}
+#scrim.show{display:block}
+.overlay{position:fixed;z-index:41;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(1000px,94vw);max-height:88vh;overflow:auto;background:var(--card);
+  border:1px solid var(--bd);border-radius:12px;box-shadow:var(--shadow);
+  padding:13px 15px 15px;display:none}
+.overlay.show{display:block}
+/* the region h3 rule is uppercase + muted; an overlay title is neither */
+.overlay h3{margin:0 0 2px;font-size:16px;text-transform:none;letter-spacing:0;color:var(--fg)}
+.overlay .sub{margin:0 0 9px;color:var(--mut);font-size:12.5px}
+.overlay .close{position:absolute;top:9px;right:11px}
+.overlay svg{width:100%;height:auto;display:block;background:var(--bg);
+  border:1px solid var(--bd);border-radius:8px}
+.overlay .cnt{font-size:12px;color:var(--mut);margin-top:7px}
+.mlist{margin:0;padding:0;list-style:none}
+.mlist li{border-top:1px solid var(--bd);padding:6px 4px}
+.mlist li:last-child{border-bottom:1px solid var(--bd)}
+.mlist button.mrow{display:block;width:100%;text-align:left;border:0;background:none;padding:0}
+.mlist button.mrow:hover .nm{text-decoration:underline}
+g.mnode{cursor:pointer;transform-box:fill-box;transform-origin:center}
+g.mnode:hover rect.mbox{stroke-width:3}
+rect.mbox{stroke-width:1.6;fill:var(--gf,var(--code));stroke:var(--gs,var(--mut))}
+text.mlbl{font-size:12px;font-weight:600;fill:var(--fg)}
+text.mkind{font-size:10px;fill:var(--mut);letter-spacing:.05em;text-transform:uppercase}
+path.mem-edge{fill:none;stroke:var(--fg);stroke-width:1.4;marker-end:url(#arrowE)}
+text.mverb{font-size:11px;fill:var(--fg)}
+rect.mverbbg{fill:var(--bg);stroke:var(--bd);stroke-width:.8;rx:3}
+
 .mapbar{position:absolute;right:8px;bottom:8px;display:flex;gap:5px;z-index:5}
 .maphint{position:absolute;left:10px;bottom:9px;font-size:11.5px;color:var(--mut);z-index:5}
+.hitrow{outline:2px solid var(--acc);outline-offset:1px}
 
-/* ---------- print ---------- */
+/* ---------- print: List is the print form ---------- */
 @media print{
   :root{--bg:#fff;--fg:#000;--card:#fff;--bd:#999;--mut:#333;--dim:1}
   body{font-size:11pt}
-  header .tools,.mapbar,.maphint{display:none}
+  header .tools,.mapbar,.maphint,.viewbar,#scrim,.overlay{display:none !important}
   main{display:block;padding:0}
   section.region{break-inside:avoid;page-break-inside:avoid;margin:0 0 10px;border-color:#999}
   details.card{border-color:#999}
   details.card>.detail{display:block !important}
-  g.node.dim,path.edge.dim,g.elab.dim{opacity:1}
-  #svgwrap{height:auto;min-height:0;overflow:visible}
-  svg{height:520px}
+  /* the SVG views cannot be trusted to paginate; the relation tree can */
+  #v-overview,#v-grid{display:none !important}
+  #v-list{display:block !important;overflow:visible;height:auto}
+  #map>.body{overflow:visible;height:auto}
+  .trow{break-inside:avoid;page-break-inside:avoid}
 }
 </style>
 </head>
@@ -173,19 +268,44 @@ local file to read it.</div></noscript>
 <main>
   <section class="region" id="frame"><h2><span>1 &middot; Frame</span></h2><div class="body"></div></section>
   <section class="region" id="now"><h2><span>2 &middot; Now</span></h2><div class="body"></div></section>
-  <section class="region" id="map"><h2><span>3 &middot; Map</span><span class="muted" id="mapnote"></span></h2>
+  <section class="region" id="map"><h2><span>3 &middot; Map</span>
+    <span class="viewbar" id="viewbar" role="group" aria-label="Map view">
+      <button type="button" data-view="overview" aria-pressed="true">Overview</button>
+      <button type="button" data-view="list" aria-pressed="false">List</button>
+      <button type="button" data-view="grid" aria-pressed="false">Grid</button>
+    </span>
+    <span class="muted" id="mapnote"></span></h2>
     <div class="body">
-      <div id="svgwrap"></div>
-      <div class="maphint">Drag to pan &middot; wheel to zoom &middot; click a node to pin</div>
-      <div class="mapbar">
-        <button id="zin" type="button" title="Zoom in">+</button>
-        <button id="zout" type="button" title="Zoom out">&minus;</button>
-        <button id="zfit" type="button" title="Fit">Fit</button>
+      <div class="view on" id="v-overview">
+        <div id="svgwrap"></div>
+        <div class="maphint">Drag to pan &middot; wheel to zoom &middot; click a group to list its members</div>
+        <div class="mapbar">
+          <button id="zin" type="button" title="Zoom in">+</button>
+          <button id="zout" type="button" title="Zoom out">&minus;</button>
+          <button id="zfit" type="button" title="Fit">Fit</button>
+        </div>
       </div>
+      <div class="view" id="v-list"></div>
+      <div class="view" id="v-grid"></div>
     </div>
   </section>
   <section class="region" id="story"><h2><span>4 &middot; Story</span><span class="muted">newest first</span></h2><div class="body"></div></section>
 </main>
+
+<div id="scrim"></div>
+<div class="overlay" id="members" role="dialog" aria-modal="true" aria-labelledby="memtitle">
+  <button class="close" id="memclose" type="button">Close</button>
+  <h3 id="memtitle"></h3>
+  <p class="sub" id="memsub"></p>
+  <ul class="mlist" id="memlist"></ul>
+</div>
+<div class="overlay" id="ego" role="dialog" aria-modal="true" aria-labelledby="egotitle">
+  <button class="close" id="egoclose" type="button">Close</button>
+  <h3 id="egotitle"></h3>
+  <p class="sub" id="egosub"></p>
+  <div id="egosvg"></div>
+  <div class="cnt" id="egocount"></div>
+</div>
 
 <script>
 window.onerror = function (m, s, l) {
@@ -334,14 +454,20 @@ const ATLAS = /*__ATLAS_DATA__*/{};
     t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash');
   }
 
-  /* ---------------- MAP ---------------- */
-  var NW = 178, NH = 58, COLGAP = 118, ROWGAP = 26, PAD = 26;
-  var byId = {}, pos = {}, nodeG = {}, edgePaths = [], labelGs = [];
+  /* ================= MAP — three views over one model =================
+     Overview (default) shows the project at GROUP level: one enclosure per
+     group, one aggregated verb-labelled edge per ordered group pair. Drill-in
+     is a member panel and then an ego view, never an in-place expansion — an
+     expansion that contains a hub's targets reproduces the full-graph
+     occlusion it was meant to escape (design_rules.md §Bake-off addendum).
+     List is the relation tree and the print form; Grid is the group matrix,
+     whose empty cells are as informative as its full ones. */
+  var byId = {}, groupById = {};
   nodes.forEach(function (n) { byId[n.id] = n; });
+  groups.forEach(function (g) { groupById[g.id] = g; });
 
   var gOrder = (layout.group_order && layout.group_order.length)
-    ? layout.group_order.slice()
-    : groups.map(function (g) { return g.id; });
+    ? layout.group_order.slice() : groups.map(function (g) { return g.id; });
   groups.forEach(function (g) { if (gOrder.indexOf(g.id) < 0) gOrder.push(g.id); });
   var ungrouped = nodes.filter(function (n) { return gOrder.indexOf(n.group) < 0; });
   if (ungrouped.length) gOrder.push('__ungrouped__');
@@ -350,61 +476,66 @@ const ATLAS = /*__ATLAS_DATA__*/{};
   nodes.forEach(function (n) { if (nOrder.indexOf(n.id) < 0) nOrder.push(n.id); });
   function orderIdx(id) { var i = nOrder.indexOf(id); return i < 0 ? 1e6 : i; }
 
-  // Hue assignment (R10). An EXPLICIT null in layout.hues means "neutral" —
-  // this group is deliberately uncoloured and renders grey, which is how a
-  // natural grouping of six survives the five-hue budget without two groups
-  // silently sharing a hue. A group with no entry at all is a data gap, not a
-  // choice, so it still falls back to the cycle.
-  var hues = layout.hues || {};
-  var HFALL = [205, 35, 145, 280, 0];
-  var NEUTRAL = {};
-  gOrder.forEach(function (gid, i) {
-    if (Object.prototype.hasOwnProperty.call(hues, gid) && hues[gid] === null) { NEUTRAL[gid] = 1; return; }
-    if (hues[gid] == null) hues[gid] = HFALL[i % HFALL.length];
+  function gidOf(n) { return gOrder.indexOf(n.group) < 0 ? '__ungrouped__' : n.group; }
+  function glabel(gid) {
+    return (groupById[gid] || {}).label || (gid === '__ungrouped__' ? 'Ungrouped' : gid);
+  }
+
+  /* ---- palette: FIXED validated slots, assigned by group_order POSITION ----
+     layout.hues numeric values are advisory and ignored; only an explicit null
+     still means anything (this group is deliberately neutral). Past the five
+     validated slots a group goes neutral rather than take an invented sixth
+     hue — the review checklist catches that as a grouping defect. */
+  var hues = layout.hues || {}, SLOTS = 5, slotOf = {}, used = 0;
+  gOrder.forEach(function (gid) {
+    var declared = Object.prototype.hasOwnProperty.call(hues, gid) ? hues[gid] : undefined;
+    if (declared === null || gid === '__ungrouped__') { slotOf[gid] = 0; return; }
+    slotOf[gid] = (used < SLOTS) ? ++used : 0;
   });
-  function hueOf(gid) { return hues[gid] != null ? hues[gid] : 205; }
-  function grpStroke(gid) { return NEUTRAL[gid] ? 'var(--mut)' : 'hsl(' + hueOf(gid) + ',45%,50%)'; }
-  function nodeFill(gid) { return NEUTRAL[gid] ? 'var(--code)' : 'hsla(' + hueOf(gid) + ',42%,50%,0.13)'; }
-  function nodeStroke(gid) { return NEUTRAL[gid] ? 'var(--mut)' : 'hsl(' + hueOf(gid) + ',48%,45%)'; }
+  function slotCls(gid) { return slotOf[gid] ? 'gs' + slotOf[gid] : 'gsN'; }
+  function paint(elm, gid, base) {
+    elm.setAttribute('class', (base ? base + ' ' : '') + slotCls(gid));
+    return elm;
+  }
 
-  // Deterministic layered layout: one column per group (group_order), rows by node_order.
-  var cols = gOrder.map(function (gid) {
-    var mem = nodes.filter(function (n) { return (gid === '__ungrouped__') ? (gOrder.indexOf(n.group) < 0 || n.group == null) : n.group === gid; });
-    mem.sort(function (a, b) { return orderIdx(a.id) - orderIdx(b.id); });
-    return { id: gid, label: (groups.filter(function (g) { return g.id === gid; })[0] || {}).label || (gid === '__ungrouped__' ? 'Ungrouped' : gid), members: mem };
-  }).filter(function (c) { return c.members.length; });
-
-  var maxRows = cols.reduce(function (m, c) { return Math.max(m, c.members.length); }, 0);
-  var W = PAD * 2 + cols.length * NW + Math.max(0, cols.length - 1) * COLGAP;
-  var H = PAD * 2 + 26 + maxRows * NH + Math.max(0, maxRows - 1) * ROWGAP;
-  cols.forEach(function (c, ci) {
-    var x = PAD + ci * (NW + COLGAP);
-    c.x = x; c.y = PAD + 26;
-    c.members.forEach(function (n, ri) { pos[n.id] = { x: x, y: c.y + ri * (NH + ROWGAP) }; });
-    c.h = c.members.length * NH + Math.max(0, c.members.length - 1) * ROWGAP;
+  var members = {};
+  gOrder.forEach(function (gid) {
+    members[gid] = nodes.filter(function (n) { return gidOf(n) === gid; })
+      .sort(function (a, b) { return orderIdx(a.id) - orderIdx(b.id); });
   });
 
-  var svg = sv('svg', { viewBox: '0 0 ' + W + ' ' + H, preserveAspectRatio: 'xMidYMid meet', role: 'img' });
-  var defs = sv('defs');
-  [['arrow', 'var(--mut)'], ['arrowP', 'var(--pin-parent)'], ['arrowC', 'var(--pin-child)']].forEach(function (a) {
-    var m = sv('marker', { id: a[0], viewBox: '0 0 8 8', refX: 7, refY: 4, markerWidth: 7, markerHeight: 7, orient: 'auto-start-reverse' });
-    m.appendChild(sv('path', { d: 'M0,0 L8,4 L0,8 z', fill: a[1] }));
-    defs.appendChild(m);
+  /* ---- aggregation: one edge per ORDERED cross-group pair; intra-group
+         edges are reported as a count on the box, not as a self-loop ---- */
+  var pairKeys = [], pairs = {}, intra = {};
+  gOrder.forEach(function (g) { intra[g] = 0; });
+  edges.forEach(function (e) {
+    var a = byId[e.from], b = byId[e.to];
+    if (!a || !b) return;
+    var ga = gidOf(a), gb = gidOf(b);
+    if (ga === gb) { intra[ga] = (intra[ga] || 0) + 1; return; }
+    var k = ga + '>' + gb;
+    if (!pairs[k]) { pairs[k] = { from: ga, to: gb, edges: [], verbs: {} }; pairKeys.push(k); }
+    pairs[k].edges.push(e);
+    pairs[k].verbs[e.verb] = (pairs[k].verbs[e.verb] || 0) + 1;
   });
-  svg.appendChild(defs);
-  var root = sv('g', { id: 'root' });
-  svg.appendChild(root);
-  var gLayerBox = sv('g'), gLayerEdge = sv('g'), gLayerLbl = sv('g'), gLayerNode = sv('g');
-  root.appendChild(gLayerBox); root.appendChild(gLayerEdge); root.appendChild(gLayerLbl); root.appendChild(gLayerNode);
-
-  // enclosure boxes (R7: common region = chunk boundary; label sits on the box, no legend)
-  cols.forEach(function (c) {
-    var pad = 12;
-    gLayerBox.appendChild(sv('rect', { class: 'grp-box', x: c.x - pad, y: c.y - pad - 16, width: NW + pad * 2, height: c.h + pad * 2 + 16, rx: 10,
-      stroke: grpStroke(c.id) }));
-    var t = sv('text', { class: 'grp-label', x: c.x - pad + 6, y: c.y - pad - 4 });
-    t.textContent = c.label; gLayerBox.appendChild(t);
-  });
+  // Hybrid label: name the dominant verb with its count, but never drop a
+  // distinct verb from the pair — a hidden relation type is worse than a long
+  // label (R3: relations are labelled, not implied).
+  function aggLabel(p) {
+    var vs = Object.keys(p.verbs).sort(function (a, b) { return p.verbs[b] - p.verbs[a] || (a < b ? -1 : 1); });
+    var top = vs[0], n = p.verbs[top];
+    if (vs.length === 1) return txt(top, 'RELATION?') + (n > 1 ? ' ×' + n : '');
+    if (vs.length === 2 && p.verbs[vs[1]] === 1 && n > 1) return top + ' ×' + n + ' + ' + vs[1];
+    return vs.join(', ');
+  }
+  function hasDelta(gid) {
+    if (members[gid].some(function (n) { return n.delta; })) return true;
+    return edges.some(function (e) {
+      if (!e.delta) return false;
+      var a = byId[e.from], b = byId[e.to];
+      return (a && gidOf(a) === gid) || (b && gidOf(b) === gid);
+    });
+  }
 
   function kindShape(kind) {
     // Redundant, non-colour encoding of kind (R10). One rx per kind and no two
@@ -425,177 +556,470 @@ const ATLAS = /*__ATLAS_DATA__*/{};
     if (st === 'unknown') return '9 3 2 3';
     return null;
   }
-
-  nodes.forEach(function (n) {
-    var p = pos[n.id]; if (!p) return;
-    // outer <g> carries the translate; inner <g class="node"> carries the CSS
-    // hover scale — a CSS transform on the same element would override the
-    // presentation attribute and throw the node back to the origin.
-    var outer = sv('g', { transform: 'translate(' + p.x + ',' + p.y + ')' });
-    var g = sv('g', { class: 'node', 'data-id': n.id, tabindex: '0' });
-    var r = sv('rect', {
-      class: 'box', x: 0, y: 0, width: NW, height: NH, rx: kindShape(n.kind),
-      fill: nodeFill(n.group), stroke: nodeStroke(n.group),
-      'stroke-dasharray': statusDash(n.status)
+  function arrowDefs(defs, list) {
+    list.forEach(function (a) {
+      // userSpaceOnUse: markers must NOT scale with stroke-width, or an
+      // aggregated edge drawn at 3.7px grows a blob for an arrowhead.
+      var m = sv('marker', { id: a[0], viewBox: '0 0 8 8', refX: 7, refY: 4,
+        markerWidth: 10, markerHeight: 10, markerUnits: 'userSpaceOnUse',
+        orient: 'auto-start-reverse' });
+      m.appendChild(sv('path', { d: 'M0,0 L8,4 L0,8 z', fill: a[1] }));
+      defs.appendChild(m);
     });
-    g.appendChild(r);
-    var lbl = sv('text', { class: 'lbl', x: 9, y: 17 });
-    var name = txt(n.label, '?') + (n.status === 'unknown' && !/\?\s*$/.test(txt(n.label)) ? ' ?' : '');
-    lbl.textContent = name.length > 26 ? name.slice(0, 25) + '…' : name;
-    g.appendChild(lbl);
-    var kd = sv('text', { class: 'kind', x: 9, y: 31 });
-    kd.textContent = txt(n.kind, 'artifact') + ' · ' + txt(n.status, 'active') + (n.delta ? ' · ' + n.delta : '');
-    g.appendChild(kd);
-    var ds = sv('text', { class: 'desc', x: 9, y: 46 });
-    var dtxt = txt(n.desc, '');
-    ds.textContent = dtxt.length > 34 ? dtxt.slice(0, 33) + '…' : dtxt;
-    g.appendChild(ds);
-    var ttl = sv('title');
-    ttl.textContent = txt(n.label) + ' — ' + txt(n.kind) + '/' + txt(n.status) + (dtxt ? '\n' + dtxt : '') + (n.link ? '\n' + n.link : '');
-    g.appendChild(ttl);
-    g.addEventListener('click', function (ev) { ev.stopPropagation(); pin(n.id); });
-    g.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); pin(n.id); } });
-    outer.appendChild(g);
-    gLayerNode.appendChild(outer);
-    nodeG[n.id] = g;
-  });
-
-  function colOf(id) { var n = byId[id]; if (!n) return 0; for (var i = 0; i < cols.length; i++) { if (cols[i].members.indexOf(n) >= 0) return i; } return 0; }
-
-  edges.forEach(function (e) {
-    var a = pos[e.from], b = pos[e.to]; if (!a || !b) return;
-    var ca = colOf(e.from), cb = colOf(e.to), d;
-    var ay = a.y + NH / 2, by = b.y + NH / 2;
-    if (cb > ca) { var x1 = a.x + NW, x2 = b.x, dx = (x2 - x1) * 0.5; d = 'M' + x1 + ',' + ay + ' C' + (x1 + dx) + ',' + ay + ' ' + (x2 - dx) + ',' + by + ' ' + x2 + ',' + by; }
-    else if (cb < ca) { var x3 = a.x, x4 = b.x + NW, dx2 = (x3 - x4) * 0.5; d = 'M' + x3 + ',' + ay + ' C' + (x3 - dx2) + ',' + ay + ' ' + (x4 + dx2) + ',' + by + ' ' + x4 + ',' + by; }
-    else { var x5 = a.x + NW, off = 46 + Math.abs(by - ay) * 0.25; d = 'M' + x5 + ',' + ay + ' C' + (x5 + off) + ',' + ay + ' ' + (x5 + off) + ',' + by + ' ' + (b.x + NW) + ',' + by; }
-    var p = sv('path', { class: 'edge', d: d, 'data-from': e.from, 'data-to': e.to });
-    if (e.delta) p.setAttribute('stroke-dasharray', '6 3');
-    gLayerEdge.appendChild(p);
-    edgePaths.push(p);
-    // verb ON the edge (R1 contiguity, R3 labeled relations) — never a legend
-    var lg = sv('g', { class: 'elab', 'data-from': e.from, 'data-to': e.to });
-    var bg = sv('rect', { class: 'verbbg' });
-    var tv = sv('text', { class: 'verb', 'text-anchor': 'middle' });
-    tv.textContent = txt(e.verb, 'RELATION?');
-    lg.appendChild(bg); lg.appendChild(tv);
-    gLayerLbl.appendChild(lg);
-    labelGs.push({ g: lg, bg: bg, t: tv, path: p });
-  });
-
-  document.getElementById('svgwrap').appendChild(svg);
-
-  labelGs.forEach(function (L) {
-    var pt;
-    try { pt = L.path.getPointAtLength(L.path.getTotalLength() / 2); } catch (err) { pt = null; }
-    if (!pt) { var m = /M([-\d.]+),([-\d.]+)/.exec(L.path.getAttribute('d')) || [0, 0, 0]; pt = { x: +m[1] + 40, y: +m[2] }; }
-    L.t.setAttribute('x', pt.x); L.t.setAttribute('y', pt.y + 3.5);
-    var w = Math.max(24, L.t.textContent.length * 5.9 + 8);
-    L.bg.setAttribute('x', pt.x - w / 2); L.bg.setAttribute('y', pt.y - 8);
-    L.bg.setAttribute('width', w); L.bg.setAttribute('height', 15);
-  });
-
-  document.getElementById('mapnote').textContent = nodes.length + ' nodes · ' + edges.length + ' edges · ' + cols.length + ' groups';
-
-  /* ---- pan + zoom ---- */
-  var vx = 0, vy = 0, vz = 1;
-  function applyView() { root.setAttribute('transform', 'translate(' + vx + ',' + vy + ') scale(' + vz + ')'); }
-  var wrap = document.getElementById('svgwrap');
-  wrap.addEventListener('wheel', function (ev) {
-    ev.preventDefault();
-    var f = ev.deltaY < 0 ? 1.12 : 1 / 1.12, nz = Math.min(4, Math.max(0.25, vz * f));
-    var r = svg.getBoundingClientRect(), sx = (ev.clientX - r.left) / r.width * W, sy = (ev.clientY - r.top) / r.height * H;
-    vx = sx - (sx - vx) * (nz / vz); vy = sy - (sy - vy) * (nz / vz); vz = nz; applyView();
-  }, { passive: false });
-  var dragging = false, lx = 0, ly = 0;
-  wrap.addEventListener('pointerdown', function (ev) { dragging = true; lx = ev.clientX; ly = ev.clientY; wrap.className = 'drag'; wrap.setPointerCapture(ev.pointerId); });
-  wrap.addEventListener('pointermove', function (ev) {
-    if (!dragging) return;
-    var r = svg.getBoundingClientRect();
-    vx += (ev.clientX - lx) * (W / r.width); vy += (ev.clientY - ly) * (H / r.height);
-    lx = ev.clientX; ly = ev.clientY; applyView();
-  });
-  ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (t) {
-    wrap.addEventListener(t, function () { dragging = false; wrap.className = ''; });
-  });
-  document.getElementById('zin').addEventListener('click', function () { vz = Math.min(4, vz * 1.2); applyView(); });
-  document.getElementById('zout').addEventListener('click', function () { vz = Math.max(0.25, vz / 1.2); applyView(); });
-  document.getElementById('zfit').addEventListener('click', function () { vx = 0; vy = 0; vz = 1; applyView(); });
-  svg.addEventListener('click', function () { pin(null); });
-
-  function centreOn(id) {
-    var p = pos[id]; if (!p) return;
-    vz = Math.max(vz, 1);
-    vx = W / 2 - (p.x + NW / 2) * vz; vy = H / 2 - (p.y + NH / 2) * vz; applyView();
+  }
+  function clip(s, n) { s = txt(s); return s.length > n ? s.slice(0, n - 1) + '…' : s; }
+  function deltaChip(host, d) { if (d) host.appendChild(el('span', 'badge delta', d === 'new' ? 'new' : 'changed')); }
+  function cubic(x1, y1, cx1, cy1, cx2, cy2, x2, y2, t) {
+    var u = 1 - t, a = u * u * u, b = 3 * u * u * t, c = 3 * u * t * t, d = t * t * t;
+    return { x: a * x1 + b * cx1 + c * cx2 + d * x2, y: a * y1 + b * cy1 + c * cy2 + d * y2 };
+  }
+  function labelBox(host, x, y, s, bgCls, txCls) {
+    var g = sv('g');
+    var w = Math.max(26, s.length * 6.1 + 10);
+    g.appendChild(sv('rect', { class: bgCls, x: x - w / 2, y: y - 9, width: w, height: 17 }));
+    var t = sv('text', { class: txCls, x: x, y: y + 3.5, 'text-anchor': 'middle' });
+    t.textContent = s; g.appendChild(t);
+    host.appendChild(g);
+    return g;
   }
 
-  /* ---- click-to-pin: parents one hue, children another, rest dimmed ---- */
-  var pinned = null;
-  function pin(id) {
-    pinned = (pinned === id) ? null : id;
-    var par = {}, chi = {};
-    if (pinned) {
-      edges.forEach(function (e) { if (e.to === pinned) par[e.from] = 1; if (e.from === pinned) chi[e.to] = 1; });
+  /* ================= drill-in overlays ================= */
+  var scrim = document.getElementById('scrim');
+  var memEl = document.getElementById('members'), egoEl = document.getElementById('ego');
+  function anyOpen() { return memEl.classList.contains('show') || egoEl.classList.contains('show'); }
+  function closeOverlays() {
+    memEl.classList.remove('show'); egoEl.classList.remove('show'); scrim.classList.remove('show');
+  }
+  function showOverlay(o) {
+    memEl.classList.remove('show'); egoEl.classList.remove('show');
+    o.classList.add('show'); scrim.classList.add('show');
+  }
+  scrim.addEventListener('click', closeOverlays);
+  document.getElementById('memclose').addEventListener('click', closeOverlays);
+  document.getElementById('egoclose').addEventListener('click', closeOverlays);
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && anyOpen()) closeOverlays(); });
+
+  function openMembers(gid) {
+    var mem = members[gid] || [];
+    document.getElementById('memtitle').textContent = glabel(gid);
+    document.getElementById('memsub').textContent =
+      mem.length + ' node' + (mem.length === 1 ? '' : 's') +
+      ' · ' + (intra[gid] || 0) + ' internal edge' + ((intra[gid] || 0) === 1 ? '' : 's') +
+      ' · pick a node for its ego view';
+    var host = document.getElementById('memlist');
+    while (host.firstChild) host.removeChild(host.firstChild);
+    mem.forEach(function (n) {
+      var li = el('li'), b = el('button', 'mrow'); b.type = 'button'; b.setAttribute('data-id', n.id);
+      var head = el('div', 'head');
+      head.appendChild(el('span', 'kchip k-' + txt(n.kind, 'artifact'), txt(n.kind, 'artifact')));
+      head.appendChild(el('span', 'nm', txt(n.label, n.id)));
+      head.appendChild(el('span', 'sdash st-' + txt(n.status, 'active'), txt(n.status, 'active')));
+      deltaChip(head, n.delta);
+      b.appendChild(head);
+      if (n.desc) b.appendChild(el('div', 'rdesc', n.desc));
+      b.addEventListener('click', function () { openEgo(n.id); });
+      li.appendChild(b); host.appendChild(li);
+    });
+    memEl.setAttribute('data-group', gid);
+    showOverlay(memEl);
+  }
+
+  function openEgo(id) {
+    var n = byId[id]; if (!n) return;
+    var pars = edges.filter(function (e) { return e.to === id; });
+    var kids = edges.filter(function (e) { return e.from === id; });
+    document.getElementById('egotitle').textContent = txt(n.label, id);
+    var sub = document.getElementById('egosub');
+    sub.textContent = txt(n.kind, 'artifact') + ' · ' + txt(n.status, 'active') +
+      ' · ' + glabel(gidOf(n)) + (n.delta ? ' · ' + n.delta : '') + (n.desc ? ' — ' + n.desc : '');
+    var host = document.getElementById('egosvg');
+    while (host.firstChild) host.removeChild(host.firstChild);
+
+    var CW = 250, CH = 36, GAPY = 9, EGW = 1180;
+    var rows = Math.max(pars.length, kids.length, 1);
+    var EGH = 64 + rows * (CH + GAPY);
+    var es = sv('svg', { viewBox: '0 0 ' + EGW + ' ' + EGH, preserveAspectRatio: 'xMidYMid meet', role: 'img' });
+    var ed = sv('defs'); arrowDefs(ed, [['arrowE', 'var(--fg)']]); es.appendChild(ed);
+    var cy = EGH / 2, mid = (EGW - CW) / 2;
+
+    function chip(x, y, nd, cls) {
+      var g = sv('g', { class: cls });
+      g.appendChild(paint(sv('rect', {
+        x: x, y: y, width: CW, height: CH, rx: kindShape(nd.kind),
+        'stroke-dasharray': statusDash(nd.status)
+      }), gidOf(nd), 'mbox'));
+      var t1 = sv('text', { class: 'mlbl', x: x + 9, y: y + 15 });
+      t1.textContent = clip(txt(nd.label, nd.id), 32) + (nd.delta ? ' •' : ''); g.appendChild(t1);
+      var t2 = sv('text', { class: 'mkind', x: x + 9, y: y + 29 });
+      t2.textContent = clip(txt(nd.kind, 'artifact') + ' · ' + glabel(gidOf(nd)).toLowerCase(), 36);
+      g.appendChild(t2);
+      es.appendChild(g);
     }
-    Object.keys(nodeG).forEach(function (nid) {
-      var g = nodeG[nid], c = 'node';
-      if (pinned) {
-        if (nid === pinned) c += ' pinned';
-        else if (par[nid] && chi[nid]) c += ' parent child both';
-        else if (par[nid]) c += ' parent';
-        else if (chi[nid]) c += ' child';
-        else c += ' dim';
-      }
-      g.setAttribute('class', c);
+    // Bundles of parallel edges would stack their labels in one column; each fan
+    // spreads its labels ALONG its own curve, so every label still touches the
+    // edge it names (R1 contiguity) without piling up on the hub.
+    function link(x1, y1, x2, y2, verb, i, cnt, tag) {
+      var dx = (x2 - x1) * 0.5;
+      es.appendChild(sv('path', { class: 'mem-edge', 'data-ego': tag,
+        d: 'M' + x1 + ',' + y1 + ' C' + (x1 + dx) + ',' + y1 + ' ' + (x2 - dx) + ',' + y2 + ' ' + x2 + ',' + y2 }));
+      var t = cnt > 1 ? 0.34 + 0.58 * (i / (cnt - 1)) : 0.5;
+      var p = cubic(x1, y1, x1 + dx, y1, x2 - dx, y2, x2, y2, t);
+      labelBox(es, p.x, p.y, txt(verb, 'RELATION?'), 'mverbbg', 'mverb');
+    }
+    chip(mid, cy - CH / 2, n, 'egocentre');
+    pars.forEach(function (e, i) {
+      var y = cy - (pars.length - 1) * (CH + GAPY) / 2 + i * (CH + GAPY) - CH / 2;
+      chip(10, y, byId[e.from] || { id: e.from, label: e.from, kind: 'artifact', group: n.group }, 'egoparent');
+      link(10 + CW, y + CH / 2, mid, cy, e.verb, pars.length - 1 - i, pars.length, 'in');
     });
-    edgePaths.forEach(function (p) {
-      var f = p.getAttribute('data-from'), t = p.getAttribute('data-to'), c = 'edge';
-      if (pinned) {
-        if (t === pinned) c += ' parent'; else if (f === pinned) c += ' child'; else c += ' dim';
-      }
-      p.setAttribute('class', c);
+    kids.forEach(function (e, i) {
+      var y = cy - (kids.length - 1) * (CH + GAPY) / 2 + i * (CH + GAPY) - CH / 2;
+      chip(EGW - CW - 10, y, byId[e.to] || { id: e.to, label: e.to, kind: 'artifact', group: n.group }, 'egochild');
+      link(mid + CW, cy, EGW - CW - 10, y + CH / 2, e.verb, i, kids.length, 'out');
     });
-    labelGs.forEach(function (L) {
-      var f = L.g.getAttribute('data-from'), t = L.g.getAttribute('data-to');
-      L.g.setAttribute('class', 'elab' + (pinned && f !== pinned && t !== pinned ? ' dim' : ''));
-    });
-    if (pinned) centreOn(pinned);
+    host.appendChild(es);
+    var c = document.getElementById('egocount');
+    c.textContent = pars.length + ' incoming (parents, left) · ' + kids.length + ' outgoing (children, right)';
+    c.setAttribute('data-parents', pars.length); c.setAttribute('data-children', kids.length);
+    egoEl.setAttribute('data-node', id);
+    showOverlay(egoEl);
   }
 
-  /* ---- search: >=2 chars, jump + highlight across all four regions ---- */
+  /* ================= view 1 — OVERVIEW ================= */
+  var GW = 172, PITCH = 196, PAD = 26, BANDY = 250, OVH = 500;
+  var OVW = PAD * 2 + Math.max(0, gOrder.length - 1) * PITCH + GW;
+  var boxOf = {}, gboxEl = {}, agglabEl = {};
+  gOrder.forEach(function (gid, i) {
+    var h = 92 + Math.min(members[gid].length, 12) * 4;   // sized by member count
+    boxOf[gid] = { x: PAD + i * PITCH, y: BANDY - h / 2, w: GW, h: h, i: i };
+  });
+
+  function routeAgg(p) {
+    var A = boxOf[p.from], B = boxOf[p.to];
+    var span = Math.abs(B.i - A.i), back = B.i < A.i;
+    if (!back) {                                  // forward: bow above the band
+      var x1 = A.x + A.w, x2 = B.x, apex = Math.min(A.y, B.y) - (34 + span * 26);
+      var c1 = x1 + (x2 - x1) * 0.28, c2 = x1 + (x2 - x1) * 0.72;
+      var y1 = A.y + A.h * 0.30, y2 = B.y + B.h * 0.30;
+      return { d: 'M' + x1 + ',' + y1 + ' C' + c1 + ',' + apex + ' ' + c2 + ',' + apex + ' ' + x2 + ',' + y2,
+               mx: cubic(x1, y1, c1, apex, c2, apex, x2, y2, .5).x,
+               my: cubic(x1, y1, c1, apex, c2, apex, x2, y2, .5).y };
+    }
+    var a1 = A.x, a2 = B.x + B.w, lo = Math.max(A.y + A.h, B.y + B.h) + (38 + span * 26);
+    var d1 = a1 - (a1 - a2) * 0.28, d2 = a1 - (a1 - a2) * 0.72;
+    var ya = A.y + A.h * 0.72, yb = B.y + B.h * 0.72;
+    return { d: 'M' + a1 + ',' + ya + ' C' + d1 + ',' + lo + ' ' + d2 + ',' + lo + ' ' + a2 + ',' + yb,
+             mx: cubic(a1, ya, d1, lo, d2, lo, a2, yb, .5).x,
+             my: cubic(a1, ya, d1, lo, d2, lo, a2, yb, .5).y };
+  }
+
+  var ovSvg = sv('svg', { viewBox: '0 0 ' + OVW + ' ' + OVH, preserveAspectRatio: 'xMidYMid meet', role: 'img' });
+  (function () {
+    var defs = sv('defs'); arrowDefs(defs, [['arrow', 'var(--mut)']]); ovSvg.appendChild(defs);
+    var root = sv('g', { id: 'ovroot' }); ovSvg.appendChild(root);
+    var lAgg = sv('g'), lLbl = sv('g'), lBox = sv('g');
+    root.appendChild(lAgg); root.appendChild(lLbl); root.appendChild(lBox);
+
+    pairKeys.forEach(function (k) {
+      var p = pairs[k], r = routeAgg(p);
+      lAgg.appendChild(sv('path', { class: 'agg', d: r.d,
+        'stroke-width': (1.5 + Math.min(2.5, (p.edges.length - 1) * 0.32)).toFixed(2),
+        'stroke-dasharray': p.edges.some(function (e) { return e.delta; }) ? '6 3' : null,
+        'data-from': p.from, 'data-to': p.to, 'data-count': p.edges.length }));
+      var lg = labelBox(lLbl, r.mx, r.my, aggLabel(p), 'agglblbg', 'agglbl');
+      lg.setAttribute('class', 'agglab');
+      lg.setAttribute('data-from', p.from); lg.setAttribute('data-to', p.to);
+      agglabEl[k] = lg;
+    });
+
+    gOrder.forEach(function (gid) {
+      var b = boxOf[gid], mem = members[gid];
+      var g = sv('g', { class: 'gbox', 'data-group': gid, tabindex: '0', role: 'button' });
+      g.appendChild(paint(sv('rect', { x: b.x, y: b.y, width: b.w, height: b.h, rx: 12 }), gid, 'shell'));
+      var nm = sv('text', { class: 'gname', x: b.x + 12, y: b.y + 21 });
+      nm.textContent = clip(glabel(gid), 24); g.appendChild(nm);
+      var ct = sv('text', { class: 'gcount', x: b.x + 12, y: b.y + 39 });
+      ct.textContent = mem.length + ' node' + (mem.length === 1 ? '' : 's'); g.appendChild(ct);
+      var it = sv('text', { class: 'gintra', x: b.x + 12, y: b.y + 55 });
+      it.textContent = (intra[gid] || 0) + ' internal edge' + ((intra[gid] || 0) === 1 ? '' : 's');
+      g.appendChild(it);
+      var teas = mem.slice(0, 3).map(function (n) { return txt(n.label, n.id); }).join(', ');
+      if (mem.length > 3) teas += ', …';
+      var tt = sv('text', { class: 'gteaser', x: b.x + 12, y: b.y + 71 });
+      tt.textContent = clip(teas, 30); g.appendChild(tt);
+      var op = sv('text', { class: 'gopen', x: b.x + 12, y: b.y + b.h - 10 });
+      op.textContent = 'click for members'; g.appendChild(op);
+      if (hasDelta(gid)) {
+        var db = sv('text', { class: 'gopen', x: b.x + b.w - 12, y: b.y + 21, 'text-anchor': 'end' });
+        db.textContent = '• delta'; g.appendChild(db);
+      }
+      var ttl = sv('title');
+      ttl.textContent = glabel(gid) + ' — ' + mem.length + ' nodes, ' + (intra[gid] || 0) + ' internal edges';
+      g.appendChild(ttl);
+      g.addEventListener('click', function (ev) { ev.stopPropagation(); openMembers(gid); });
+      g.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); openMembers(gid); }
+      });
+      lBox.appendChild(g); gboxEl[gid] = g;
+    });
+
+    document.getElementById('svgwrap').appendChild(ovSvg);
+
+    /* pan + zoom */
+    var vx = 0, vy = 0, vz = 1, moved = 0;
+    function applyView() { root.setAttribute('transform', 'translate(' + vx + ',' + vy + ') scale(' + vz + ')'); }
+    var wrap = document.getElementById('svgwrap');
+    wrap.addEventListener('wheel', function (ev) {
+      ev.preventDefault();
+      var f = ev.deltaY < 0 ? 1.12 : 1 / 1.12, nz = Math.min(4, Math.max(0.25, vz * f));
+      var r = ovSvg.getBoundingClientRect();
+      var sx = (ev.clientX - r.left) / (r.width || OVW) * OVW, sy = (ev.clientY - r.top) / (r.height || OVH) * OVH;
+      vx = sx - (sx - vx) * (nz / vz); vy = sy - (sy - vy) * (nz / vz); vz = nz; applyView();
+    }, { passive: false });
+    var dragging = false, lx = 0, ly = 0;
+    wrap.addEventListener('pointerdown', function (ev) {
+      dragging = true; moved = 0; lx = ev.clientX; ly = ev.clientY; wrap.className = 'drag';
+      if (wrap.setPointerCapture) { try { wrap.setPointerCapture(ev.pointerId); } catch (err) {} }
+    });
+    wrap.addEventListener('pointermove', function (ev) {
+      if (!dragging) return;
+      var r = ovSvg.getBoundingClientRect();
+      moved += Math.abs(ev.clientX - lx) + Math.abs(ev.clientY - ly);
+      vx += (ev.clientX - lx) * (OVW / (r.width || OVW)); vy += (ev.clientY - ly) * (OVH / (r.height || OVH));
+      lx = ev.clientX; ly = ev.clientY; applyView();
+    });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (t) {
+      wrap.addEventListener(t, function () { dragging = false; wrap.className = ''; });
+    });
+    document.getElementById('zin').addEventListener('click', function () { vz = Math.min(4, vz * 1.2); applyView(); });
+    document.getElementById('zout').addEventListener('click', function () { vz = Math.max(0.25, vz / 1.2); applyView(); });
+    document.getElementById('zfit').addEventListener('click', function () { vx = 0; vy = 0; vz = 1; applyView(); });
+    ovSvg.addEventListener('click', function () { if (moved <= 6 && anyOpen()) closeOverlays(); });
+  })();
+
+  /* ================= view 2 — LIST (relation tree, print form) =================
+     Every outgoing edge is a chip on its source row, so all edges appear at
+     least once; a node with no outgoing edge shows its incoming ones instead,
+     so no node is left relation-blank. */
+  var rowEl = {};
+  (function () {
+    var out = {}, inn = {};
+    edges.forEach(function (e) {
+      (out[e.from] = out[e.from] || []).push(e);
+      (inn[e.to] = inn[e.to] || []).push(e);
+    });
+    var host = document.getElementById('v-list');
+    gOrder.forEach(function (gid) {
+      var sec = paint(el('section'), gid, 'tgroup');
+      sec.setAttribute('data-group', gid);
+      sec.appendChild(el('h4', null, glabel(gid)));
+      var mem = members[gid];
+      sec.appendChild(el('p', 'ghint', mem.length + ' node' + (mem.length === 1 ? '' : 's') +
+        ' · ' + (intra[gid] || 0) + ' internal · ' +
+        (slotOf[gid] ? 'palette slot ' + slotOf[gid] : 'neutral (no hue by choice)')));
+      mem.forEach(function (n) {
+        var row = el('div', 'trow'); row.id = 'row-' + n.id; row.setAttribute('data-id', n.id);
+        var head = el('div', 'head');
+        head.appendChild(el('span', 'kchip k-' + txt(n.kind, 'artifact'), txt(n.kind, 'artifact')));
+        head.appendChild(el('span', 'nm', txt(n.label, n.id)));
+        head.appendChild(el('span', 'sdash st-' + txt(n.status, 'active'), txt(n.status, 'active')));
+        deltaChip(head, n.delta);
+        head.appendChild(el('span', 'rdesc', txt(n.desc, '')));
+        row.appendChild(head);
+        var rels = el('div', 'rels'), os = out[n.id] || [], is = inn[n.id] || [];
+        os.forEach(function (e) { rels.appendChild(chipFor(e, 'out')); });
+        if (!os.length) {
+          if (is.length) is.forEach(function (e) { rels.appendChild(chipFor(e, 'in')); });
+          else rels.appendChild(el('span', 'norel', 'no recorded relations'));
+        }
+        row.appendChild(rels);
+        sec.appendChild(row); rowEl[n.id] = row;
+      });
+      host.appendChild(sec);
+    });
+    function chipFor(e, dir) {
+      var otherId = dir === 'out' ? e.to : e.from, other = byId[otherId] || { label: otherId };
+      var b = el('button', 'rchip' + (dir === 'in' ? ' inbound' : ''));
+      b.type = 'button';
+      b.setAttribute('data-from', e.from); b.setAttribute('data-to', e.to);
+      b.setAttribute('data-dir', dir); b.setAttribute('data-target', 'row-' + otherId);
+      b.appendChild(document.createTextNode(dir === 'out' ? '→' : '←'));
+      b.appendChild(el('span', 'vb', txt(e.verb, 'RELATION?')));
+      b.appendChild(document.createTextNode(txt(other.label, otherId)));
+      if (e.delta) b.appendChild(el('span', 'vb', '•'));
+      b.addEventListener('click', function () { setView('list'); flashRow(otherId); });
+      return b;
+    }
+  })();
+  function flashRow(id) {
+    var t = rowEl[id]; if (!t) return;
+    if (t.scrollIntoView) t.scrollIntoView({ block: 'center' });
+    t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash');
+  }
+
+  /* ================= view 3 — GRID (N x N group matrix) =================
+     Rows = from-group, columns = to-group, both in group_order. The diagonal
+     carries the intra-group counts the Overview reports as text. Empty cells
+     are drawn as faint dashed outlines rather than omitted: the directions
+     that carry nothing are part of the finding. */
+  var cellEl = {}, axRowEl = {}, axColEl = {};
+  (function () {
+    var N = gOrder.length, CS = 104, LW = 132, TH = 78, GPAD = 14;
+    var GRW = LW + N * CS + GPAD, GRH = TH + N * CS + GPAD + 26;
+    var idx = {}; gOrder.forEach(function (g, i) { idx[g] = i; });
+    var cnt = [], verbs = [];
+    for (var i = 0; i < N; i++) { cnt.push(new Array(N).fill(0)); verbs.push([]); for (var j = 0; j < N; j++) verbs[i].push({}); }
+    edges.forEach(function (e) {
+      var a = byId[e.from], b = byId[e.to]; if (!a || !b) return;
+      var r = idx[gidOf(a)], c = idx[gidOf(b)];
+      cnt[r][c]++; verbs[r][c][e.verb] = (verbs[r][c][e.verb] || 0) + 1;
+    });
+    var mx = 0; cnt.forEach(function (r) { r.forEach(function (v) { if (v > mx) mx = v; }); });
+
+    var g = sv('svg', { viewBox: '0 0 ' + GRW + ' ' + GRH, preserveAspectRatio: 'xMidYMid meet', role: 'img' });
+    g.setAttribute('style', 'height:auto;max-width:' + GRW + 'px');
+    var cap = sv('text', { class: 'axcap', x: LW, y: 16 }); cap.textContent = 'to group →'; g.appendChild(cap);
+    var cap2 = sv('text', { class: 'axcap', x: 4, y: 16 }); cap2.textContent = '↓ from group'; g.appendChild(cap2);
+
+    gOrder.forEach(function (gid, c) {
+      var x = LW + c * CS;
+      var sw = paint(sv('rect', { x: x + 6, y: TH - 30, width: 13, height: 13, rx: 3 }), gid, 'axswatch');
+      sw.setAttribute('data-axcol', gid); g.appendChild(sw); axColEl[gid] = sw;
+      var t = sv('text', { class: 'axlbl', x: x + 24, y: TH - 19 });
+      t.textContent = clip(glabel(gid), 12); g.appendChild(t);
+    });
+    gOrder.forEach(function (gid, r) {
+      var y = TH + r * CS;
+      var sw = paint(sv('rect', { x: 6, y: y + CS / 2 - 7, width: 13, height: 13, rx: 3 }), gid, 'axswatch');
+      sw.setAttribute('data-axrow', gid); g.appendChild(sw); axRowEl[gid] = sw;
+      var t = sv('text', { class: 'axlbl', x: 25, y: y + CS / 2 + 4 });
+      t.textContent = clip(glabel(gid), 15); g.appendChild(t);
+    });
+
+    var populated = 0;
+    for (var r2 = 0; r2 < N; r2++) {
+      for (var c2 = 0; c2 < N; c2++) {
+        var v = cnt[r2][c2], x = LW + c2 * CS, y = TH + r2 * CS;
+        var cg = sv('g', { class: 'gcell', 'data-row': gOrder[r2], 'data-col': gOrder[c2], 'data-count': v });
+        var cls = 'cell ' + (v ? 'full' : 'empty') + (r2 === c2 ? ' diag' : '');
+        var rect = sv('rect', { class: cls, x: x + 3, y: y + 3, width: CS - 6, height: CS - 6, rx: 6 });
+        // magnitude on a single hue via opacity over the surface — one hue, so
+        // it never competes with the five categorical group slots
+        if (v) { rect.setAttribute('fill-opacity', (0.12 + 0.43 * (v / (mx || 1))).toFixed(3)); populated++; }
+        cg.appendChild(rect);
+        if (v) {
+          var tn = sv('text', { class: 'cn', x: x + CS / 2, y: y + CS / 2 - 2, 'text-anchor': 'middle' });
+          tn.textContent = v; cg.appendChild(tn);
+          var vv = Object.keys(verbs[r2][c2]).sort(function (a, b) { return verbs[r2][c2][b] - verbs[r2][c2][a] || (a < b ? -1 : 1); });
+          var tv = sv('text', { class: 'cv', x: x + CS / 2, y: y + CS / 2 + 13, 'text-anchor': 'middle' });
+          // clip the verb, THEN append the "+N" — truncating the whole string
+          // would silently drop the marker that says other verbs exist here
+          tv.textContent = clip(vv[0], 14) + (vv.length > 1 ? ' +' + (vv.length - 1) : '');
+          cg.appendChild(tv);
+        }
+        var ttl = sv('title');
+        ttl.textContent = glabel(gOrder[r2]) + ' → ' + glabel(gOrder[c2]) + ': ' +
+          (v ? v + ' edge' + (v === 1 ? '' : 's') : 'no relation in this direction');
+        cg.appendChild(ttl);
+        cellEl[gOrder[r2] + '>' + gOrder[c2]] = cg;
+        g.appendChild(cg);
+      }
+    }
+    var foot = sv('text', { class: 'axcap', x: 4, y: GRH - 8 });
+    foot.textContent = populated + ' of ' + (N * N) + ' directions carry a relation · diagonal = intra-group';
+    g.appendChild(foot);
+    document.getElementById('v-grid').appendChild(g);
+  })();
+
+  /* ================= view switching ================= */
+  var VIEWS = ['overview', 'list', 'grid'], curView = 'overview';
+  var VNOTE = {
+    overview: gOrder.length + ' groups · ' + pairKeys.length + ' aggregated relations · ' +
+      nodes.length + ' nodes, ' + edges.length + ' edges folded in',
+    list: nodes.length + ' nodes · ' + edges.length + ' edges · every edge appears at least once',
+    grid: gOrder.length + '×' + gOrder.length + ' group matrix · empty cells shown'
+  };
+  function setView(v) {
+    if (VIEWS.indexOf(v) < 0) v = 'overview';
+    curView = v;
+    VIEWS.forEach(function (n) {
+      var d = document.getElementById('v-' + n);
+      if (d) d.className = 'view' + (n === v ? ' on' : '');
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('#viewbar button'), function (b) {
+      b.setAttribute('aria-pressed', b.getAttribute('data-view') === v ? 'true' : 'false');
+    });
+    document.getElementById('mapnote').textContent = VNOTE[v];
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('#viewbar button'), function (b) {
+    b.addEventListener('click', function () { setView(b.getAttribute('data-view')); });
+  });
+  setView('overview');
+
+  /* ---- search: >=2 chars, and it means something different in each view ----
+     Overview has no node marks to highlight, so a hit opens the node's ego
+     view and marks its group box; List scrolls and flashes the row; Grid
+     highlights the row and column of the matching node's group. FRAME and
+     STORY cards highlight in all three. */
   var qEl = document.getElementById('q');
   function clearHits() {
     Array.prototype.forEach.call(document.querySelectorAll('.hit'), function (n) { n.classList.remove('hit'); });
-    Object.keys(nodeG).forEach(function (nid) { nodeG[nid].classList.remove('hit'); });
+    Array.prototype.forEach.call(document.querySelectorAll('.hitrow'), function (n) { n.classList.remove('hitrow'); });
+    Object.keys(gboxEl).forEach(function (g) { gboxEl[g].setAttribute('class', 'gbox'); });
+    Object.keys(axRowEl).forEach(function (g) { axRowEl[g].setAttribute('class', 'axswatch ' + slotCls(g)); });
+    Object.keys(axColEl).forEach(function (g) { axColEl[g].setAttribute('class', 'axswatch ' + slotCls(g)); });
+    Object.keys(cellEl).forEach(function (k) { cellEl[k].setAttribute('class', 'gcell'); });
   }
   function search() {
     var q = qEl.value.trim().toLowerCase();
     clearHits();
     if (q.length < 2) return;
-    var first = null;
-    nodes.forEach(function (n) {
-      var hay = (txt(n.label) + ' ' + txt(n.desc) + ' ' + txt(n.kind) + ' ' + txt(n.group)).toLowerCase();
-      if (hay.indexOf(q) >= 0 && nodeG[n.id]) { nodeG[n.id].classList.add('hit'); if (!first) first = n.id; }
+    var hits = nodes.filter(function (n) {
+      return (txt(n.label) + ' ' + txt(n.desc) + ' ' + txt(n.kind) + ' ' + txt(n.group)).toLowerCase().indexOf(q) >= 0;
     });
     Array.prototype.forEach.call(document.querySelectorAll('details.card'), function (d) {
       if (d.textContent.toLowerCase().indexOf(q) >= 0) { d.classList.add('hit'); d.open = true; }
     });
-    if (first) centreOn(first);
-    else {
-      var h = document.querySelector('details.card.hit');
-      if (h) h.scrollIntoView({ block: 'center' });
+    if (hits.length) {
+      var first = hits[0], fg = gidOf(first);
+      if (curView === 'overview') {
+        if (gboxEl[fg]) gboxEl[fg].setAttribute('class', 'gbox hit');
+        openEgo(first.id);
+      } else if (curView === 'list') {
+        hits.forEach(function (n) { if (rowEl[n.id]) rowEl[n.id].classList.add('hitrow'); });
+        flashRow(first.id);
+      } else {
+        var gs = {}; hits.forEach(function (n) { gs[gidOf(n)] = 1; });
+        Object.keys(gs).forEach(function (g) {
+          if (axRowEl[g]) axRowEl[g].setAttribute('class', 'axswatch hit ' + slotCls(g));
+          if (axColEl[g]) axColEl[g].setAttribute('class', 'axswatch hit ' + slotCls(g));
+          gOrder.forEach(function (o) {
+            if (cellEl[g + '>' + o]) cellEl[g + '>' + o].setAttribute('class', 'gcell hit');
+            if (cellEl[o + '>' + g]) cellEl[o + '>' + g].setAttribute('class', 'gcell hit');
+          });
+        });
+      }
+      return;
     }
+    var h = document.querySelector('details.card.hit');
+    if (h && h.scrollIntoView) h.scrollIntoView({ block: 'center' });
   }
   qEl.addEventListener('input', search);
   document.getElementById('clr').addEventListener('click', function () { qEl.value = ''; clearHits(); });
 
-  // Print: nothing that matters may be hidden on paper (R15). Expand every card.
+  // Print: nothing that matters may be hidden on paper (R15). Expand every card
+  // and switch the map to the List view — the two SVG views cannot be trusted
+  // to paginate, the relation tree can.
+  function forPrint() {
+    Array.prototype.forEach.call(document.querySelectorAll('details.card'), function (d) { d.open = true; });
+    closeOverlays();
+    setView('list');
+  }
   if (window.matchMedia) {
     var mq = window.matchMedia('print');
-    if (mq.addEventListener) mq.addEventListener('change', function (e) { if (e.matches) openAll(); });
+    if (mq.addEventListener) mq.addEventListener('change', function (e) { if (e.matches) forPrint(); });
   }
-  window.addEventListener('beforeprint', openAll);
-  function openAll() { Array.prototype.forEach.call(document.querySelectorAll('details.card'), function (d) { d.open = true; }); }
+  window.addEventListener('beforeprint', forPrint);
 })();
 </script>
 </body>

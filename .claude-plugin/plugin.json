@@ -1,6 +1,6 @@
 {
   "name": "coeus",
-  "version": "3.21.0",
+  "version": "3.22.0",
   "description": "E&P-industry skill suite for high-stakes decisions: LLM-Council multi-model deliberation, EP-Council 9-supermajor adversarial deal review, Morpheus prompt-engineering pipeline, The Architect adaptive combo, Plugin-Creator, Coeus-Router (Tier-3 meta-skill), Seer (spec-driven routing evaluation — synthesizes scenarios from skill frontmatter, grades the router with a cascading rubric), Project-Lifecycle, Atlas (project atlas generator — one self-contained interactive HTML explaining any project at a glance: intent, scope, artifact map, causal history, guardrails, re-entry state), Minto (pyramid-principle structuring engine — verified Barbara Minto doctrine: answer-first pyramids, SCQ introductions, MECE groupings — for memos, reports, proposals, decks), Office Tools (OOXML repair/fields/inventory), Seismic Tools (dug_binary extracts horizons, polygons, volumes, per-volume process history, and volume lineage from DUG Insight project.dugprj into user-selected xlsx/DOCX/HTML artefacts), plus bundled Caveman and Prompt-Master.",
   "author": {
     "name": "ENERGEIA SERVICES PTE. LTD.",

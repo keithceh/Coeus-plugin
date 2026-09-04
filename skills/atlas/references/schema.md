@@ -20,7 +20,7 @@ never a crash).
 | `now` | object | yes | Region ② |
 | `map` | object | yes | Region ③ |
 | `story` | object | yes | Region ④ |
-| `layout` | object | yes | Frozen ordering and hue assignment |
+| `layout` | object | yes | Frozen ordering; neutral-group marking |
 
 ---
 
@@ -30,7 +30,7 @@ never a crash).
 |---|---|---|---|
 | `project` | string | yes | Display name, header strip |
 | `generated` | string | yes | ISO-8601 date or datetime of this build |
-| `atlas_version` | string | yes | Schema/generator version, `"1.0.0"` for this release |
+| `atlas_version` | string | yes | Schema/generator version, `"1.1.0"` for this release |
 | `sources[]` | array of object | yes | Every mined source. `{kind, path, note?}` where `kind` ∈ `handover \| artefacts_index \| telemetry \| git \| readme \| changelog \| docs \| filesystem \| interview \| user` |
 
 `sources[]` is the traceability spine: nothing may appear in `frame`, `map`, or
@@ -123,19 +123,54 @@ reduced to a dated one-liner fails R4 and the Phase-3 checklist.
 |---|---|---|
 | `node_order[]` | array of node ids | Render order within the map. Inherited verbatim on refresh; new ids appended at the end of their group's run |
 | `group_order[]` | array of group ids | Column/band order in the map. Inherited verbatim on refresh |
-| `hues` | object `{group_id: hue}` | One entry per group. `hue` is a 0–359 integer, or `null` for a **neutral** group. **At most 5 non-null hues** (hard cap 7); the template derives the fill and border from the value |
+| `hues` | object `{group_id: hue}` | One entry per group. Only `null` vs non-null is read — see below. **At most 5 non-null entries** (hard cap 7) |
 
-`hue: null` is the escape hatch when the reader's natural grouping runs to six:
-the group renders grey — no hue assigned — and the five-hue budget still holds.
-Use it for a layer that genuinely is not one of the peer categories (a meta or
+**Numeric `hues` values are deprecated and ignored (since 1.1.0).** The template
+owns a fixed, CVD-validated five-slot categorical palette and assigns it by
+`group_order` **position**, with separately-stepped light and dark values — so a
+hue can no longer be chosen badly, duplicated, or left to a fallback cycle. An
+integer left in the file is advisory only; it changes nothing. What the field
+still decides is `null`:
+
+`hue: null` marks a group **neutral** — it renders grey and consumes no palette
+slot. It is the escape hatch when the reader's natural grouping runs to six: use
+it for a layer that genuinely is not one of the peer categories (a meta or
 routing layer, an "unsorted" band), never to squeeze a sixth real category past
-the cap. A group **missing** from `hues` is a data gap rather than a choice, so
-the template falls back to its hue cycle and may duplicate a colour — give every
-group an explicit entry, `null` included.
+the cap. A group **missing** from `hues` is treated as non-neutral and takes the
+next slot; give every group an explicit entry, `null` included, so "neutral"
+reads as a deliberate choice rather than an omission. Past the fifth non-neutral
+group the template goes neutral rather than invent a sixth hue, which the Phase-3
+checklist reads as a grouping defect to fix in the *data*.
 
-The template performs a deterministic layered layout honouring `group_order` and
-`node_order` — no force-directed physics, so the same JSON always renders the
-same picture (R12).
+The template performs a deterministic layout honouring `group_order` (the
+left-to-right order of the Overview boxes, and both axes of the Grid matrix) and
+`node_order` (member order inside every panel and List section) — no
+force-directed physics, so the same JSON always renders the same picture (R12).
+
+### What the Map region does with this object (1.1.0)
+
+Three views over the one model, switched by a segmented control in the region
+header and all fed by `map` + `layout`:
+
+- **Overview** (default) — one enclosure per group in `group_order`, sized by
+  member count, showing the count, an internal-edge count, and two or three
+  member names. Between groups, **one aggregated edge per ordered group pair**
+  that has any underlying edges, labelled with the dominant verb and its count
+  plus any minority verb (`routes-to ×8 + shares-rules-with`), stroke width
+  scaled mildly by edge count. Intra-group edges are the box's "N internal
+  edges" line, not a self-loop.
+- **List** — the relation tree: group sections, node rows carrying kind chip,
+  status, description and `delta`, and relation chips. Every edge appears at
+  least once. Zero SVG, and the print form.
+- **Grid** — an N×N group matrix, N = group count, rows `from` / columns `to`,
+  cell = edge count plus dominant verb, diagonal = the intra-group counts.
+  **Empty cells stay visible** as faint outlines: the directions that carry no
+  relation are part of the reading.
+
+Drill-in is a **member panel** (group click) and then an **ego view** (node
+click): the node centred, parents left, children right, every edge verb-labelled.
+There is no full node-link graph and no in-place group expansion — see
+`design_rules.md` §Bake-off addendum for why.
 
 ---
 
@@ -200,7 +235,7 @@ same picture (R12).
   "layout": {
     "node_order": ["cube25", "cube19", "vols", "depth", "rec"],
     "group_order": ["data", "work", "deliv"],
-    "hues": {"data": 205, "work": 35, "deliv": 145}
+    "hues": {"data": 0, "work": 0, "deliv": null}
   }
 }
 ```
@@ -208,4 +243,14 @@ same picture (R12).
 Note in the example: `depth` is a marked unknown rather than a guess; `G2` has a
 `null` origin because no beat established it; `B3` is a `failure` beat that still
 carries what/why/outcome; `delta` markers appear only on items that moved since
-the prior build.
+the prior build. In `layout.hues` the two `0` values are **not** a duplicated
+hue and not a bug — numeric values are ignored since 1.1.0, so `data` and `work`
+simply take palette slots 1 and 2 by their position in `group_order`; `deliv` is
+marked `null` and renders neutral grey. Written today the numbers would be
+omitted in favour of `null`-or-not, and both spellings render identically.
+
+This example's map yields an Overview of three boxes and two aggregated edges
+(`data → work` "feeds", `work → deliv` "supports"), with the other two edges
+counted as "1 internal edge" on the `data` and `work` boxes; a Grid of 9 cells,
+4 populated (including two on the diagonal) and 5 shown empty; and a List in
+which all four edges appear at least once.

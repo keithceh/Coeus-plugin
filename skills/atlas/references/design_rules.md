@@ -221,9 +221,27 @@ Coeus's house rules at once.
 Content and encoding:
 
 - [ ] Every edge in `map.edges` carries a `verb`. No bare arrows.
-- [ ] ≤ 5 non-null hues in `layout.hues` (hard cap 7); no two groups share a hue;
-      a sixth group is neutral (`"hue": null`), not a duplicate. Every
+- [ ] ≤ 5 non-neutral groups (hard cap 7); a sixth is neutral (`"hue": null`),
+      not a duplicate. The template assigns its validated palette by
+      `group_order` position, so a *shared* colour now means too many groups,
+      not a bad hue choice — fix the grouping, not the number. Every
       colour-coded distinction also carries a shape or border difference (R10).
+
+Map views (all three render from the one model):
+
+- [ ] **Overview** draws no more boxes than there are groups, and every box
+      states its member count and its internal-edge count.
+- [ ] Every aggregated Overview edge carries a verb label; one edge per ordered
+      group pair, never one per underlying edge.
+- [ ] **List** contains every edge in `map.edges` at least once, and no node row
+      is left relation-blank.
+- [ ] **Grid** renders its empty cells visibly; the diagonal equals the
+      intra-group counts and the cells sum to the edge total.
+- [ ] The **ego view** labels every edge it draws, on both sides.
+- [ ] No full node-link graph and no in-place group expansion. *Rationale: an
+      expansion that contains a hub's targets reproduces exactly the full-graph
+      occlusion it was meant to escape — established empirically on this repo's
+      own data, 2026-Sep-02.*
 - [ ] `delta` markers appear only on a refresh, never on a first build.
 - [ ] Colour encodes only externally-real distinctions — status, group — never an
       invented taxonomy (R11).
@@ -264,6 +282,63 @@ Truthfulness and containment:
 - [ ] It actually renders: the `window.onerror` banner is not showing, node and
       edge counts match `atlas.json`, and search responds at 2 characters. Both
       checks above pass on a file that throws on load — this one does not.
+
+---
+
+## Bake-off addendum (2026-Sep-02)
+
+**These are our own empirical results on this repository's atlas data (26 nodes,
+37 edges, 5 groups), not literature.** They are single-dataset findings from one
+six-way comparison, so treat them as this project's evidence, not as a general
+law. They are why 1.1.0 looks the way it does.
+
+**The comparison.** Six renderings of the identical JSON were built and read
+side by side: the 1.0.0 full node-link graph; a two-level group view; an
+indented relation tree; a group-level heatmap; a clustered node-node matrix; and
+a degree-by-verb bar chart. Findings:
+
+- **The full graph does not survive a hub.** One node held 16 of the 37 edges.
+  At that concentration its edge bundle crosses three of the five group columns
+  and roughly a third of the verb labels land on top of node bodies. The graph
+  was readable only by pinning — which makes it a query tool, not a map. This is
+  R6 ("if it becomes a hairball, regroup, do not route") measured rather than
+  asserted.
+- **In-place expansion inherits the same failure.** Expanding one group in place
+  keeps the other groups still, but the expanded group's members pull in every
+  edge that touches them; where those include a hub's targets, the occlusion
+  returns inside the enclosure. Hence 1.1.0 drills into a *panel*, not into the
+  canvas.
+- **Negative space carries information.** The group matrix showed that only 11
+  of 25 possible directed group-pairs carry any relation at all. The 14 empty
+  cells were the most commented-on part of the whole comparison and are
+  invisible in every node-link form, which can only draw what exists. Hence the
+  Grid view, and hence its empty cells are drawn rather than omitted.
+- **The declared families are a human judgement, not link structure.**
+  Hierarchical clustering of the 26×26 adjacency (cosine, average linkage, cut
+  at k=5) failed to recover the five declared groups: **purity 54%, adjusted
+  Rand 0.05**, with 20 of 26 nodes collapsing into one cluster because
+  link-similarity is dominated by "connected to the hub". Useful as an
+  occasional audit; a warning against ever *deriving* the grouping. R5 (groups
+  follow the reader's mental model) survives this test — the reader's model is
+  doing work the topology cannot.
+- **The original hue derivation failed accessibility validation.** The 1.0.0
+  scheme derived each group's colour as `hsl(hue, 45%, 44%)` from an integer in
+  `layout.hues`. Run through a CVD validator (protanopia/deuteranopia, Machado
+  2009 at severity 1.0, ΔE in OKLab×100), the four hues this project had chosen
+  measured **worst-pair ΔE 5.2 against a ≥8 target**, with two of them also
+  under the chroma floor — they read as grey, not as identity. Snapping to the
+  nearest passing steps while holding the hue families still failed (red vs
+  orange, ΔE 7.1 normal-vision against a ≥15 floor). No four-hue set held up in
+  both light and dark. That is what motivated moving colour out of the data
+  entirely: 1.1.0 ships a fixed validated five-slot palette assigned by
+  `group_order` position, so an atlas cannot pick an unreadable colour because
+  the choice no longer exists. Shape and border-dash redundancy (R10) is
+  unchanged and still carries the load in monochrome.
+
+*Uncertainty:* one dataset, one project, one reader. The occlusion and
+negative-space findings are visible enough that we would expect them to
+generalise to any hub-shaped project; the clustering result is a property of
+*this* topology and should be re-run, not assumed, on another.
 
 ---
 

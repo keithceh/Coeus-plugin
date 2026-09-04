@@ -1,6 +1,6 @@
 ---
 name: atlas
-version: 1.0.0
+version: 1.1.0
 argument-hint: "[create|refresh|interview] [optional project path]"
 description: >-
   Trigger on: /coeus:atlas, "project atlas", "project map", "project at a glance", "visualise this project", "visualize this project", "explain this project visually", "map my project". Builds one self-contained interactive HTML atlas of any project (coding or not): intent, scope, artifact map, causal history, guardrails, re-entry state. Fires only for a visual overview OF A PROJECT — never for DUG lineage, session resume or handover, or document structuring.
@@ -27,8 +27,12 @@ altering the template or the review checklist.
 Four fixed regions, canonical order, never reordered between versions:
 **① FRAME** (intent, scope in/out, guardrails, references) · **② NOW**
 (re-entry cue: where work stopped, open threads, next actions) · **③ MAP**
-(enclosure-grouped node-link graph, verbs on every edge) · **④ STORY**
-(causal beats — did X → broke on Y → hence Z — with forks and guardrail badges).
+(three views — **Overview** group-level enclosures with one aggregated
+verb-labelled edge per group pair, the default; **List** the relation tree, and
+the print form; **Grid** the group-to-group matrix with its empty cells shown —
+node drill-in is a member panel then an **ego view**, never a full node-link
+graph) · **④ STORY** (causal beats — did X → broke on Y → hence Z — with forks
+and guardrail badges).
 
 ---
 
@@ -86,9 +90,12 @@ placeholder with `status: unknown` — never guessed, never quietly dropped.
    literal `/*__ATLAS_DATA__*/{}` — comment **and** the empty braces, in one
    substitution — with the JSON. Replacing only the comment leaves a stray `{}`
    after the data and the file will not parse. No other edit to the shell.
-3. Grouping and hues: fold the natural grouping into **≤ 5 reader-model groups**,
-   or mark one genuinely non-peer group neutral with `"hue": null`. Never let two
-   groups share a hue, and never leave a group out of `layout.hues`.
+3. Grouping: fold the natural grouping into **≤ 5 reader-model groups**, or mark
+   one genuinely non-peer group neutral with `"hue": null`. Colour is not your
+   decision — the template owns a fixed, validated five-slot palette and assigns
+   it by `group_order` **position**. Numeric `layout.hues` values are advisory and
+   ignored; only `null` still carries meaning. Give every group an entry anyway,
+   `null` included, so "neutral" reads as a choice.
 
 **Refresh rule.** If a prior `atlas.json` exists, load it first and preserve
 `layout.node_order`, `layout.group_order`, and group assignment verbatim — new
@@ -109,9 +116,12 @@ not the delegation, is the deliverable.
 
 1. **Design-rule check — always, inline.** Run the checklist in
    [references/design_rules.md](references/design_rules.md) §Review Checklist:
-   every edge carries a verb; ≤5 hues and no colour-only encoding; no legend or
-   footnote key; every guardrail links to its origin beat; story is causal, not a
-   dated list; four regions in canonical order; unknowns marked, not invented.
+   every edge carries a verb; Overview shows no more boxes than groups and every
+   aggregated edge is verb-labelled; every edge appears in List at least once;
+   Grid shows its empty cells; the ego view labels every edge; ≤5 groups and no
+   colour-only encoding; no legend or footnote key; every guardrail links to its
+   origin beat; story is causal, not a dated list; four regions in canonical
+   order; unknowns marked, not invented.
 2. **Self-containment check — always.** `grep -n "http" Outputs/atlas.html`:
    hits allowed only inside the embedded JSON data, comments, or the shell's SVG
    namespace constant. Zero `<script src`, zero `<link href`; `url(` only as a
@@ -119,10 +129,14 @@ not the delegation, is the deliverable.
    survived injection. A file that needs the network is a failed atlas.
 3. **Render check — always.** A file that throws on load passes both checks
    above. Load `Outputs/atlas.html` and confirm the `window.onerror` banner is
-   **not** showing and the map actually drew nodes. Where a headless runner is
-   available (node + jsdom, Playwright), assert it: node count and edge count
-   match `atlas.json`, every edge label is non-empty, search at 2 characters
-   hits. Fix the *data* and re-render; the shell is not edited to pass a check.
+   **not** showing and the Overview actually drew its group boxes. Where a
+   headless runner is available (node + jsdom, Playwright), assert it: one box
+   per group and one labelled edge per ordered group pair; a group click opens
+   the member panel with the right member count; a node click opens the ego view
+   with the right parent/child counts; List carries every edge as at least one
+   chip; Grid's cells sum to the edge count and its diagonal equals the
+   intra-group counts; all three toggles and search work. Fix the *data* and
+   re-render; the shell is not edited to pass a check.
 4. **Council review — gated.** Only on explicit request: launch
    `Skill(skill="coeus:llm-council", args="<the atlas + its sources>")` to
    stress-test the *claims* the atlas makes. Skip silently otherwise.
@@ -144,9 +158,13 @@ commit.
   or an explicit user answer; unknowns render as marked `?` placeholders.
 - **Verbs on edges.** An unlabeled edge is a defect ("constrains", "feeds",
   "supersedes", "forked-from" — never a bare arrow).
-- **≤5 categorical hues** (hard cap 7), redundant shape/border on every encoded
-  distinction; the atlas must read in monochrome. A sixth group takes
-  `"hue": null` (neutral grey) — hues are never duplicated.
+- **Palette is the template's, not yours.** A fixed, CVD-validated five-slot
+  categorical set, assigned by `group_order` position and stepped separately for
+  light and dark. `"hue": null` is the one signal the data still sends: that
+  group stays neutral grey. Hues are never duplicated — past five non-neutral
+  groups the template refuses to invent a sixth and goes neutral, which the
+  checklist reads as a grouping defect. Redundant shape/border on every encoded
+  distinction; the atlas must read in monochrome.
 - **`delta` is refresh-only.** Never set `new` or `changed` on a first build:
   there is nothing to have changed from, and the markers spend the R8
   signalling budget on noise.

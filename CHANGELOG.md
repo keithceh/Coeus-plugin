@@ -2,6 +2,40 @@
 
 ---
 
+## 2026-Sep-04 (v3.22.0) · 2026-Sep-04 01:54 · atlas v1.1.0 — composite Map: Overview / List / Grid + ego drill-in; validated palette
+
+### Changed — `skills/atlas/` v1.1.0: the Map region is now three views with drill-in, replacing the single full node-link graph
+Decision grounded in a six-way bake-off on this repo's own atlas data (26 nodes / 37 edges): three interactive renderings (full graph, two-level, relation tree) against the three seaborn statistical forms best suited to relationship data (group heatmap, clustermap, verb-profile bar), each validated headless and in real Chromium. The full graph confirmed its own defect — one hub (`coeus-router`, 16 `routes-to` edges) hairballs the middle of the canvas and ~a third of verb labels occlude node bodies. The winning composite covers glance / interrogation / record in one self-contained file:
+
+- **Overview (default)** — group-level enclosures in `group_order`, ONE aggregated verb-labelled edge per ordered group pair (hybrid labels, e.g. `routes-to ×8 + shares-rules-with`; stroke width mildly scaled by count), intra-group edges as an in-box count. ~5 boxes and ~8 edges on screen — inside the working-memory budget the doctrine is built on.
+- **Drill-in** — clicking a group opens a member panel; clicking a node opens the **ego view** (node centered, parents left / children right, every edge verb-labelled). In-place group expansion was built, tested, and REJECTED: any expansion containing a hub's targets reproduces the full-graph occlusion in miniature (established empirically 2026-Sep-02; rationale recorded in `design_rules.md`).
+- **List view** — the relation tree: group sections, node rows, every one of the edges present as at least one named chip, chip-click jump. Zero SVG, monochrome-proof; the print form (auto-expanded on print).
+- **Grid view** — the group-to-group matrix as native SVG (no Python at read time): cell = count + dominant verb, diagonal = intra-group, **empty cells drawn visibly** — the negative-space payoff the seaborn heatmap demonstrated and the box-and-edge Overview structurally cannot show. Magnitude shading is a single-hue opacity ramp (magnitude ≠ identity; spends no categorical slot).
+- **Validated palette** — the v1.0.0 raw `hsl(hue, 45%, 44%)` group hues FAILED colorblind-safety validation in both themes (adjacent-pair CVD ΔE 5.2 against the ≥8 target; chroma floor; dark-band violations). Replaced by a fixed five-slot categorical palette validated for light AND dark surfaces, assigned by `group_order` position, never cycled; `"hue": null` still renders neutral; numeric `layout.hues` values are now advisory-ignored (only null-vs-non-null carries meaning). All shape/border/dash redundancy retained — nothing is colour-only.
+- **Search** works in all three views (Overview match → ego view; List → scroll+flash; Grid → row/col highlight). Self-containment, `<noscript>`, `window.onerror` banner, injection literal, dynamic title, layout freeze on refresh, and delta markers all carried over; deltas now surface in List rows, member panels, ego views, and as a badge on group boxes.
+
+### Docs — same change set
+`SKILL.md` (Map description, Phase-2 grouping/palette step, Phase-3 checklist + render check, Hard Rules; ~2,050 tokens of the 3,000 cap), `references/schema.md` (hues deprecation, Map-views section, worked example), `references/design_rules.md` (Review Checklist "Map views" block + **Bake-off addendum, 2026-Sep-02** recording our own empirical results, flagged single-dataset: the six-way comparison; the clustering negative result — cosine clustering on the adjacency recovers the declared families at purity 54% / adjusted Rand 0.05, i.e. the families are human judgment the link structure does not contain; and the palette validation failure that motivated the swap).
+
+### Registration
+SKILL_REGISTRY atlas row → v1.1.0 with the three views; README atlas row updated; plugin.json 3.22.0; Coeus_LLM_HANDOVER.md header + table row. Router untouched (no trigger changes; golden set stays 31).
+
+### Validation
+`build-plugin.py --check-only` CHECK PASS 17 skills, 0 warnings; `coeus_full_test.py` PASS 232 / FAIL 0; regenerated Coeus demo atlas passes a 96-assertion jsdom suite and 181 assertions in real Chromium (light + dark, all views, ego + member overlays, zero page errors). Three defects were caught ONLY in the browser leg (marker `strokeWidth` inheritance, an inherited uppercase `h3` rule, panel-row scoping) — the render check added in v1.0.x is earning its keep.
+
+---
+
+## 2026-Sep-02 (workflow fix) · Mirror sync now history-preserving — fixes Cowork "cannot check for updates"
+
+### Fixed — release.yml mirror publish rewrote history every release
+Root cause of the persistent Cowork/Desktop "cannot check for updates on coeus" error: the `Publish bundle to public mirror` step ran `git init` on a fresh tree and force-pushed, creating a brand-new orphan history on keithceh/Coeus-plugin every release. Every clone in existence — including the plugin updater's marketplace clone — then failed `git pull` with `fatal: refusing to merge unrelated histories`. Verified live against the local marketplace clone.
+
+New behaviour: clone the mirror, replace the working tree (keeping `.git`), commit ON TOP of existing history, fast-forward push. Empty-repo bootstrap fallback retained for first-ever publish. Tags still force-pushed (tags move by design). One-time recovery for clones broken by the old scheme: `git fetch origin && git reset --hard origin/main` — applied to this machine's clone already.
+
+Doc updates: release.yml comments, handover force-push constraint notes (3 call-sites).
+
+---
+
 ## 2026-Sep-01 (v3.21.0) · 2026-Sep-01 15:42 · New `atlas` skill — Project Atlas generator; coeus-router v1.7.0
 
 ### Added — `skills/atlas/` (v1.0.0): one self-contained interactive HTML explaining any project at a glance
