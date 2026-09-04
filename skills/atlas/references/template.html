@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Project Atlas</title>
 <!--
-  Coeus atlas render shell v1.1.0 — self-contained by contract.
+  Coeus atlas render shell v1.2.0 — self-contained by contract.
   No external scripts, stylesheets, fonts, images, or network fetches of any
   kind — inline CSS and JS only, so the Phase-3 containment grep stays clean.
   The generator copies this file and replaces the marked injection point below
@@ -59,6 +59,8 @@ header{padding:14px 20px;border-bottom:1px solid var(--bd);background:var(--card
 header h1{margin:0 0 4px;font-size:19px;letter-spacing:.2px}
 header p{margin:0;color:var(--mut);font-size:14px;max-width:110ch}
 header .meta{margin-top:6px;font-size:12px;color:var(--mut)}
+header #mocline a{margin:0 1px}
+[hidden]{display:none !important}
 header .tools{float:right;display:flex;gap:6px;align-items:center}
 header .tools input{font:inherit;font-size:13px;padding:4px 8px;border:1px solid var(--bd);
   border-radius:6px;background:var(--bg);color:var(--fg);width:190px}
@@ -263,6 +265,7 @@ local file to read it.</div></noscript>
   <h1 id="title">Project Atlas</h1>
   <p id="intent"></p>
   <div class="meta" id="metaline"></div>
+  <div class="meta" id="mocline" hidden></div>
 </header>
 
 <main>
@@ -348,6 +351,27 @@ const ATLAS = /*__ATLAS_DATA__*/{};
   document.getElementById('metaline').textContent =
     'generated ' + txt(meta.generated, '?') + ' · atlas ' + txt(meta.atlas_version, '?') +
     ' · ' + srcs.length + ' source' + (srcs.length === 1 ? '' : 's') + (srcs.length ? ': ' + srcs.join(' | ') : '');
+
+  /* Cross-nav to the Master of Content — rendered ONLY when the data carries
+     meta.moc, so an atlas.json written before 1.2.0 renders exactly as before.
+     The filename is data-driven and resolved relative to this file, which is
+     the sibling Outputs/ path the MoC is written to. */
+  (function () {
+    var line = document.getElementById('mocline');
+    if (!meta.moc) return;
+    var a = el('a', null, 'Master of Content');
+    a.href = String(meta.moc);
+    line.appendChild(document.createTextNode('companion index: '));
+    line.appendChild(a);
+    line.appendChild(document.createTextNode(' · this page: '));
+    [['Overview', '#view=overview'], ['List', '#view=list'], ['Grid', '#view=grid']]
+      .forEach(function (v, i) {
+        if (i) line.appendChild(document.createTextNode(' · '));
+        var b = el('a', null, v[0]); b.href = v[1];
+        line.appendChild(b);
+      });
+    line.hidden = false;
+  })();
 
   /* ---------------- FRAME ---------------- */
   (function () {
@@ -951,10 +975,58 @@ const ATLAS = /*__ATLAS_DATA__*/{};
     });
     document.getElementById('mapnote').textContent = VNOTE[v];
   }
+  /* ---- hash routing: the three views are linkable ----
+     `#view=list` (canonical, what the Master of Content links to) and the bare
+     view element ids `#v-list` both select a view and scroll the Map region
+     into sight — landing on a hidden div would otherwise show nothing. Every
+     other fragment (#map, #story, #guard-G1, #beat-B3 …) is left to the
+     browser's native anchor handling, so existing links keep working. */
+  function viewFromHash(h) {
+    var m = /^#view=([a-z]+)$/.exec(h || '');
+    if (m && VIEWS.indexOf(m[1]) >= 0) return m[1];
+    m = /^#v-([a-z]+)$/.exec(h || '');
+    if (m && VIEWS.indexOf(m[1]) >= 0) return m[1];
+    return null;
+  }
+  function applyHash(scroll) {
+    var v = viewFromHash(location.hash);
+    if (!v) return false;
+    setView(v);
+    if (scroll) {
+      var m = document.getElementById('map');
+      if (m && m.scrollIntoView) m.scrollIntoView({ block: 'start' });
+    }
+    return true;
+  }
+  // Publish the view in the URL so it can be copied and shared. replaceState is
+  // preferred (no history spam, no scroll jump); where it is unavailable or a
+  // no-op — some file:// contexts and headless DOMs — fall back to location.hash
+  // and suppress the hashchange it causes, so the page does not re-scroll.
+  function publishHash(v) {
+    var want = '#view=' + v;
+    if (location.hash === want) return;
+    try { history.replaceState(null, '', want); } catch (err) {}
+    if (location.hash !== want) { location.hash = want; }
+  }
   Array.prototype.forEach.call(document.querySelectorAll('#viewbar button'), function (b) {
-    b.addEventListener('click', function () { setView(b.getAttribute('data-view')); });
+    b.addEventListener('click', function () {
+      var v = b.getAttribute('data-view');
+      setView(v);
+      publishHash(v);
+    });
+  });
+  // Idempotent rather than flag-guarded: a hashchange naming the view already
+  // on screen is a no-op, so the echo from our own publishHash cannot re-scroll
+  // the page and no pending flag can swallow a real navigation.
+  window.addEventListener('hashchange', function () {
+    var v = viewFromHash(location.hash);
+    if (!v || v === curView) return;
+    setView(v);
+    var m = document.getElementById('map');
+    if (m && m.scrollIntoView) m.scrollIntoView({ block: 'start' });
   });
   setView('overview');
+  applyHash(false);
 
   /* ---- search: >=2 chars, and it means something different in each view ----
      Overview has no node marks to highlight, so a hit opens the node's ego

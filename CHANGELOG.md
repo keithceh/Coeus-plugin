@@ -2,6 +2,19 @@
 
 ---
 
+## 2026-Sep-04 (v3.23.0) · 2026-Sep-04 05:48 · atlas v1.2.0 — Master of Content + evergreen create/refresh gate
+
+### Added — `Outputs/atlas_moc.md`: a Master of Content, the atlas's third output
+A markdown directory of every artefact for readers who want to navigate by link rather than read a picture — derived entirely from `atlas.json`, no new data collection. Contract formalised in `references/schema.md` § Master of Content: header with intent + links to `atlas.html` and all four regions; artefacts by group (every map node exactly once, `nodes[].link` reproduced as clickable relative links — project-root-relative paths rewritten with a `../` prefix because the MoC lives in `Outputs/`, the most likely silent-breakage path and now documented as its own schema rule); a second by-kind cut of the same nodes; story beats with forks branch-marked; guardrails with origin beats; sources mined; an evergreen footer ("regenerated in place — do not hand-edit; single copy, never versioned"). `atlas.html`'s header gains a data-driven "Master of Content" link (rendered only when `meta.moc` is set — pre-1.2.0 atlas.json files render unchanged), and the Map's three views became hash-addressable (`#view=overview|list|grid`) so the MoC can deep-link them; landing on a view hash selects it and scrolls the Map into sight.
+
+### Changed — create/refresh gate (evergreening, hard rule)
+Phase 2 now opens with an explicit gate: if `Outputs/atlas.json` exists, the run IS a refresh — even when invoked as `create` — announced in one line ("existing atlas found — refreshing in place"). Three output files, created once, updated in place forever; a versioned or timestamped sibling of any of them is a defect (new Phase-3 output check + Hard Rule; matches project-lifecycle's create-once-update-in-place doctrine). The MoC is derived, so refresh overwrites it in full — never merge. One legitimate new-file-on-refresh: an atlas built before 1.2.0 has no MoC and gains one. Enforcement is protocol-level (SKILL.md + checklist), not code — noted for a future `scripts/check_outputs()` if wanted.
+
+### Validation
+`build-plugin.py --check-only` CHECK PASS 17 skills, 0 warnings; `coeus_full_test.py` ALL TESTS PASS; SKILL.md ~2,464 of 3,000 tokens. Demo (this repo's own atlas): 152 jsdom + 246 real-Chromium assertions incl. MoC completeness (26 nodes exactly once in each cut, 13 beats, 6 guardrails, link-base rewriting, backward-compat boot without `meta.moc`) and a simulated second run proving the output directory stays byte-identical with zero new files. Registry row, README row, plugin.json 3.23.0, handover updated; router untouched (golden set stays 31).
+
+---
+
 ## 2026-Sep-04 (v3.22.0) · 2026-Sep-04 01:54 · atlas v1.1.0 — composite Map: Overview / List / Grid + ego drill-in; validated palette
 
 ### Changed — `skills/atlas/` v1.1.0: the Map region is now three views with drill-in, replacing the single full node-link graph

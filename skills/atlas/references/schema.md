@@ -2,8 +2,11 @@
 
 > The structured intermediate for `skills/atlas/`. Written to `Outputs/atlas.json`,
 > then injected into `references/template.html` at `/*__ATLAS_DATA__*/` to produce
-> `Outputs/atlas.html`. This file is the contract between Phase 1 (survey) and the
-> render shell — the template reads nothing else.
+> `Outputs/atlas.html`, and projected to markdown as `Outputs/atlas_moc.md`
+> (§ Master of Content, below). This file is the contract between Phase 1
+> (survey) and both renderers — they read nothing else. All three outputs are
+> created once and updated in place forever; a versioned or timestamped sibling
+> is a defect.
 
 Encoding UTF-8, no BOM. Unknown top-level keys are ignored by the template;
 missing optional keys degrade gracefully (the region renders with a marked gap,
@@ -30,8 +33,9 @@ never a crash).
 |---|---|---|---|
 | `project` | string | yes | Display name, header strip |
 | `generated` | string | yes | ISO-8601 date or datetime of this build |
-| `atlas_version` | string | yes | Schema/generator version, `"1.1.0"` for this release |
+| `atlas_version` | string | yes | Schema/generator version, `"1.2.0"` for this release |
 | `sources[]` | array of object | yes | Every mined source. `{kind, path, note?}` where `kind` ∈ `handover \| artefacts_index \| telemetry \| git \| readme \| changelog \| docs \| filesystem \| interview \| user` |
+| `moc` | string | no | Filename of the Master of Content beside `atlas.html`, normally `"atlas_moc.md"`. Its presence is what makes the atlas render a companion-index link in its header strip; omit it and the page renders exactly as it did before 1.2.0 |
 
 `sources[]` is the traceability spine: nothing may appear in `frame`, `map`, or
 `story` that does not trace to a source entry or an `interview`/`user` answer.
@@ -174,6 +178,86 @@ There is no full node-link graph and no in-place group expansion — see
 
 ---
 
+## § Master of Content — `Outputs/atlas_moc.md`
+
+An **output contract**, not an input: every line is derived from `atlas.json`
+and nothing new is collected to produce it. It is the linkable directory for a
+reader who wants to navigate to artefacts rather than look at a picture, and it
+is plain markdown so it renders in a repo browser, a wiki, or a terminal.
+
+Regenerated **in full** on every refresh. Because it is derived, overwriting is
+always safe — never merge into it, never keep an older copy beside it.
+
+Sections, in this order:
+
+**1 · Header.** `# <meta.project> — Master of Content`, then the generated date,
+`frame.intent` on one line, and the cross-links back to the visual atlas:
+
+```
+[Open the atlas](atlas.html) · [Overview](atlas.html#view=overview) ·
+[List](atlas.html#view=list) · [Grid](atlas.html#view=grid) ·
+[Story](atlas.html#story)
+```
+
+The template's Map views are hash-addressable as `#view=overview|list|grid`
+(the bare element ids `#v-overview|#v-list|#v-grid` also work); landing on one
+selects that view and scrolls the Map region into sight. The four region
+anchors `#frame`, `#now`, `#map`, `#story` are plain element ids and behave as
+ordinary anchors. Paths are **relative** — the MoC sits in the same directory
+as `atlas.html`.
+
+**2 · Artefacts by group.** One `###` section per group in
+`layout.group_order`, members in `layout.node_order`, as a table:
+
+| column | source |
+|---|---|
+| Artefact | `nodes[].label`, as `[label](link)` when `nodes[].link` is set, plain text otherwise |
+| Kind | `nodes[].kind` |
+| Status | `nodes[].status`, with `delta` appended when present |
+| What it is | `nodes[].desc` |
+
+**Link bases.** `nodes[].link` is written **relative to the project root** (that
+is what the survey mines), but the MoC lives in `Outputs/`. A project-relative
+link is therefore emitted with a `../` prefix so it resolves from where the file
+actually sits; an absolute URL (`scheme://…`), a root-absolute path (`/…`) and a
+bare fragment (`#…`) pass through untouched. Links back to the atlas itself
+(`atlas.html`, `atlas.html#view=list`) take no prefix — that file is a sibling.
+Get this wrong and every artefact link in the MoC 404s one directory down, which
+is the most likely way this output breaks.
+
+**Every node in `map.nodes` appears exactly once in this cut** — it is the
+completeness guarantee the Phase-3 checklist tests. A group heading carries its
+member count and its internal-edge count so the MoC and the Overview agree.
+
+**3 · By kind.** The same nodes cut the other way — one `###` section per kind
+that is present, in the order `input · output · artifact · external · reference
+· person`, each a bulleted list of the same links. Two mental models, one set of
+nodes: a reader who thinks "where are the inputs?" and a reader who thinks
+"what is in the build family?" both land. Omit a kind with no members rather
+than printing an empty heading.
+
+**4 · Story.** `story.beats` newest first, one line each:
+`- **<date>** — <what> (<type>)`, with `↳ branch: <branch>` on a fork beat and
+the guardrail ids it originated appended. Links to `atlas.html#story`.
+
+**5 · Guardrails.** `frame.guardrails` as `- **<id>** — <rule> *(origin: <origin_beat>)*`,
+with `origin: not established` where `origin_beat` is `null`.
+
+**6 · Sources mined.** `meta.sources` as `- <kind> — <path>` plus `note` when set.
+
+**7 · Footer.** Verbatim intent, one line:
+
+```
+Regenerated in place by `/coeus:atlas refresh` — do not hand-edit.
+Single copy, never versioned.
+```
+
+Nothing in the MoC may state anything the JSON does not: it is a projection, so
+an unknown node is listed with its `?` label and `status: unknown` exactly as it
+appears in the map, never quietly resolved.
+
+---
+
 ## Worked example (abridged, valid)
 
 ```json
@@ -181,7 +265,8 @@ There is no full node-link graph and no in-place group expansion — see
   "meta": {
     "project": "Kestrel Field Review",
     "generated": "2026-09-01",
-    "atlas_version": "1.0.0",
+    "atlas_version": "1.2.0",
+    "moc": "atlas_moc.md",
     "sources": [
       {"kind": "handover", "path": "Outputs/Kestrel_LLM_Handover.md"},
       {"kind": "artefacts_index", "path": "Outputs/artefacts_index.md"},

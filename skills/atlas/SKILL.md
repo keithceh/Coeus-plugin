@@ -1,6 +1,6 @@
 ---
 name: atlas
-version: 1.1.0
+version: 1.2.0
 argument-hint: "[create|refresh|interview] [optional project path]"
 description: >-
   Trigger on: /coeus:atlas, "project atlas", "project map", "project at a glance", "visualise this project", "visualize this project", "explain this project visually", "map my project". Builds one self-contained interactive HTML atlas of any project (coding or not): intent, scope, artifact map, causal history, guardrails, re-entry state. Fires only for a visual overview OF A PROJECT — never for DUG lineage, session resume or handover, or document structuring.
@@ -19,7 +19,11 @@ a glance. Two-stage pipeline, the house extract-then-render pattern:
 [references/schema.md](references/schema.md)) → `Outputs/atlas.html` (rendered
 from [references/template.html](references/template.html) by replacing its
 `/*__ATLAS_DATA__*/{}` injection point — that exact literal, braces included,
-replaced whole). Every layout and encoding choice is
+replaced whole) **and** `Outputs/atlas_moc.md` (a Master of Content: the same
+truth as a linkable markdown directory, for a reader who wants to navigate to
+artefacts rather than look at a picture — contract in
+[references/schema.md](references/schema.md) § Master of Content). Three files,
+created once, updated in place forever. Every layout and encoding choice is
 governed by the ranked, evidence-graded rules in
 [references/design_rules.md](references/design_rules.md) — read them before
 altering the template or the review checklist.
@@ -85,23 +89,35 @@ placeholder with `status: unknown` — never guessed, never quietly dropped.
 
 ## Phase 2 — BUILD
 
+**Gate first — create or refresh?** Look for `Outputs/atlas.json` before writing
+anything. **If it exists, this run is a REFRESH** — no matter how it was
+invoked, and no matter that the first argument says `create`. Say so in one
+line: `existing atlas found — refreshing in place`. Only when the file is
+genuinely absent is this a create.
+
 1. Emit or refresh `Outputs/atlas.json` against [references/schema.md](references/schema.md).
-2. Render `Outputs/atlas.html`: copy `references/template.html`, replace the
-   literal `/*__ATLAS_DATA__*/{}` — comment **and** the empty braces, in one
-   substitution — with the JSON. Replacing only the comment leaves a stray `{}`
-   after the data and the file will not parse. No other edit to the shell.
-3. Grouping: fold the natural grouping into **≤ 5 reader-model groups**, or mark
+   Set `meta.moc` to `"atlas_moc.md"`.
+2. Grouping: fold the natural grouping into **≤ 5 reader-model groups**, or mark
    one genuinely non-peer group neutral with `"hue": null`. Colour is not your
    decision — the template owns a fixed, validated five-slot palette and assigns
    it by `group_order` **position**. Numeric `layout.hues` values are advisory and
    ignored; only `null` still carries meaning. Give every group an entry anyway,
    `null` included, so "neutral" reads as a choice.
+3. Render `Outputs/atlas.html`: copy `references/template.html`, replace the
+   literal `/*__ATLAS_DATA__*/{}` — comment **and** the empty braces, in one
+   substitution — with the JSON. Replacing only the comment leaves a stray `{}`
+   after the data and the file will not parse. No other edit to the shell.
+4. Write `Outputs/atlas_moc.md` per schema.md § Master of Content. It is derived
+   entirely from the JSON, so a refresh **overwrites it in full** — never merge,
+   never diff-patch. Refreshing an atlas built before 1.2.0 finds no MoC and
+   creates one: that is the single legitimate new file on a refresh.
 
-**Refresh rule.** If a prior `atlas.json` exists, load it first and preserve
+**Refresh rule.** Load the prior `atlas.json` first and preserve
 `layout.node_order`, `layout.group_order`, and group assignment verbatim — new
 nodes append inside their existing group, never reshuffle (R12, spatial
 constancy). Append new story beats; rewrite `now` entirely; set `delta: "new"`
-or `"changed"` on everything that moved since the prior file.
+or `"changed"` on everything that moved since the prior file. Then re-render all
+three outputs over the existing filenames.
 
 | Work | Executor |
 |---|---|
@@ -121,13 +137,18 @@ not the delegation, is the deliverable.
    Grid shows its empty cells; the ego view labels every edge; ≤5 groups and no
    colour-only encoding; no legend or footnote key; every guardrail links to its
    origin beat; story is causal, not a dated list; four regions in canonical
-   order; unknowns marked, not invented.
+   order; unknowns marked, not invented; the MoC exists and lists every map node
+   exactly once.
 2. **Self-containment check — always.** `grep -n "http" Outputs/atlas.html`:
    hits allowed only inside the embedded JSON data, comments, or the shell's SVG
    namespace constant. Zero `<script src`, zero `<link href`; `url(` only as a
    same-document fragment. Confirm `<noscript>` and the `window.onerror` banner
    survived injection. A file that needs the network is a failed atlas.
-3. **Render check — always.** A file that throws on load passes both checks
+3. **Output check — always.** `Outputs/` holds exactly `atlas.json`,
+   `atlas.html`, `atlas_moc.md` and no versioned or timestamped sibling of any
+   of them. Open the MoC: every map node appears once in the by-group cut, and
+   its relative links resolve from `Outputs/`.
+4. **Render check — always.** A file that throws on load passes both checks
    above. Load `Outputs/atlas.html` and confirm the `window.onerror` banner is
    **not** showing and the Overview actually drew its group boxes. Where a
    headless runner is available (node + jsdom, Playwright), assert it: one box
@@ -137,7 +158,7 @@ not the delegation, is the deliverable.
    chip; Grid's cells sum to the edge count and its diagonal equals the
    intra-group counts; all three toggles and search work. Fix the *data* and
    re-render; the shell is not edited to pass a check.
-4. **Council review — gated.** Only on explicit request: launch
+5. **Council review — gated.** Only on explicit request: launch
    `Skill(skill="coeus:llm-council", args="<the atlas + its sources>")` to
    stress-test the *claims* the atlas makes. Skip silently otherwise.
 
@@ -168,6 +189,11 @@ commit.
 - **`delta` is refresh-only.** Never set `new` or `changed` on a first build:
   there is nothing to have changed from, and the markers spend the R8
   signalling budget on noise.
+- **Three output files, created once, updated in place.** `Outputs/atlas.json`,
+  `Outputs/atlas.html`, `Outputs/atlas_moc.md` — these names and no others. A
+  second copy of any of them is a defect: no `atlas_v2`, no `atlas_2026-09-04`,
+  no `atlas (1).html`, no backup beside the original. If the JSON exists the run
+  is a refresh, whatever the invocation said.
 - **Freeze the layout.** Regions never move; node order is inherited from the
   prior `atlas.json` on every refresh.
 - **Self-contained output.** One HTML file, inline CSS/JS, no CDN, font, image,

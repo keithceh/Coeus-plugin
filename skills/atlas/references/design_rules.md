@@ -283,6 +283,19 @@ Truthfulness and containment:
       edge counts match `atlas.json`, and search responds at 2 characters. Both
       checks above pass on a file that throws on load — this one does not.
 
+Outputs (created once, updated in place):
+
+- [ ] `Outputs/` holds exactly three atlas files — `atlas.json`, `atlas.html`,
+      `atlas_moc.md` — and **no versioned, timestamped, numbered or backup
+      sibling** of any of them (`atlas_v2.html`, `atlas_2026-09-04.json`,
+      `atlas_moc (1).md` …). A second copy is a defect, not a safety net.
+- [ ] `Outputs/atlas_moc.md` exists and was regenerated this run.
+- [ ] Every node in `map.nodes` appears **exactly once** in the MoC's
+      by-group cut — none dropped, none listed twice.
+- [ ] The MoC's links resolve relative to `Outputs/`: `atlas.html` and its
+      `#view=…` / `#story` fragments, plus every `nodes[].link` it reproduces.
+- [ ] If the run was a refresh, it said so before writing.
+
 ---
 
 ## Bake-off addendum (2026-Sep-02)
