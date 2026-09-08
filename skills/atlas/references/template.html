@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Project Atlas</title>
 <!--
-  Coeus atlas render shell v1.2.0 — self-contained by contract.
+  Coeus atlas render shell v1.3.0 — self-contained by contract.
   No external scripts, stylesheets, fonts, images, or network fetches of any
   kind — inline CSS and JS only, so the Phase-3 containment grep stays clean.
   The generator copies this file and replaces the marked injection point below
@@ -358,11 +358,18 @@ const ATLAS = /*__ATLAS_DATA__*/{};
      the sibling Outputs/ path the MoC is written to. */
   (function () {
     var line = document.getElementById('mocline');
-    if (!meta.moc) return;
-    var a = el('a', null, 'Master of Content');
-    a.href = String(meta.moc);
-    line.appendChild(document.createTextNode('companion index: '));
-    line.appendChild(a);
+    if (!meta.moc && !meta.toc) return;
+    var first = true;
+    function companion(label, target) {
+      if (!target) return;
+      line.appendChild(document.createTextNode(first ? 'companion pages: ' : ' · '));
+      var a = el('a', null, label);
+      a.href = String(target);
+      line.appendChild(a);
+      first = false;
+    }
+    companion('Contents', meta.toc);
+    companion('Master of Content', meta.moc);
     line.appendChild(document.createTextNode(' · this page: '));
     [['Overview', '#view=overview'], ['List', '#view=list'], ['Grid', '#view=grid']]
       .forEach(function (v, i) {

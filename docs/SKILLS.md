@@ -86,9 +86,9 @@ Extracts a complete figure and table inventory from a DOCX into a two-sheet xlsx
 Kickoff, resume, handover, audit, close — the discipline that lets a project survive session boundaries. Three core files (handover, artefacts index, telemetry log) created once at kickoff and updated in place forever; resume renames the handover to `<task>_handover_note.md` and re-links references.
 
 ### atlas — the project, at a glance
-`/coeus:atlas` · v1.2 · Tier 2 · deps: project-lifecycle (reads), llm-council (gated review)
+`/coeus:atlas` · v1.3 · Tier 1 · deps: project-lifecycle (reads), llm-council (gated review)
 
-Mines a project — lifecycle files, git repo, document folder, or a six-question interview — into one self-contained offline HTML atlas: Frame / Now / Map / Story regions, an enclosure-grouped node-link map with verbs on every edge, causal history with forks and guardrail badges. Never invents topology; unknowns render as marked placeholders. Plus a markdown Master-of-Content for link-based navigation.
+Mines a project — lifecycle files, git repo, document folder, or a six-question interview — into four evergreen outputs, created once and updated in place forever: a self-contained offline HTML atlas (Frame / Now / Map / Story; the Map opens as a group-level Overview with drill-in to per-node ego views, plus List and Grid toggles), a markdown Master-of-Content for link-based navigation, and a visual Contents hub (`atlas_toc.html`) — a clickable table of contents linking every artefact, with an inline SVG explainer of how the outputs relate and quick links into every region and view. Causal history with forks and guardrail badges; never invents topology; unknowns render as marked placeholders.
 
 ### evergreen-artefacts — evergreen publishing
 `/coeus:evergreen-artefacts` · v1.0 · Tier 1

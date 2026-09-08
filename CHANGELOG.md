@@ -2,6 +2,27 @@
 
 ---
 
+## 2026-Sep-08 (v3.25.0) · 2026-Sep-08 04:40 · atlas v1.3.0 — visual Contents hub (atlas_toc.html), fourth evergreen output
+
+### Added — `Outputs/atlas_toc.html`: the clickable table of contents that links every artefact in one place
+The designed navigation hub a cold reader opens first — derived entirely from `atlas.json`, evergreen like its siblings. One self-contained page (no CDN, no font/image/network fetch), fully readable with JavaScript off (asserted by parsing the static HTML, never by executing it):
+- **Visual explainer** — a hand-authored inline SVG of the atlas ecosystem mechanism: `atlas.json` *renders* → `atlas.html`, *derives* → `atlas_moc.md` and `atlas_toc.html`, and this page *links* → every artefact; labelled arrows, `figure`/`figcaption`/`aria-label`, "you are here" marked. Orients, does not decorate.
+- **Ten quick-link chips** — the atlas, its four region anchors (`#frame/#now/#map/#story`), its three Map views (`#view=overview|list|grid`), the Master of Content, and `atlas.json` — each a labelled chip, not a bare URL.
+- **Contents grid** — one card per family in `group_order` on the validated five-slot palette (`hue:null` neutral, kind-shape chips + status treatment, never colour-only); every node exactly once, clickable when `nodes[].link` exists (same `../` link-base rule as the MoC), truthfully marked "no file" otherwise; delta badges on refresh.
+- **By-kind second cut** with fragment cross-links — every node reachable both ways — plus an optional ≥2-character filter (page complete without it).
+- Both themes via the three-state token pattern; print stylesheet; typographic care per the artifact-design pass. No Google Fonts by deliberate trade-off: the atlas Hard Rule (opens from a NAS share with the network off) outranks the typography guidance — recorded in the schema contract so it is not re-litigated.
+
+### Changed — ecosystem wiring + gate
+`meta.toc` (optional; pre-1.3.0 files render unchanged) drives a "Contents" link in `atlas.html`'s header beside the MoC link; the MoC header links to the ToC. The evergreen gate now covers FOUR files created once and updated in place (SKILL.md pipeline/Phase-2/Hard Rules/Phase-3 output check; a pre-1.3.0 atlas gaining its ToC on refresh is the legitimate new-file case). Contract formalised in `schema.md` § Table of Contents (visual). SKILL.md ~2,641 of 3,000 tokens.
+
+### Docs
+`docs/SKILLS.md` atlas entry updated to v1.3 with the four outputs — and corrected from "Tier 2" to **Tier 1** (the registry is canonical); README and registry atlas rows now describe all four outputs; handover updated; `index.html` regenerated.
+
+### Validation
+Demo refreshed through the skill's own evergreen rules first (intent 17→18 skills, `evergreen-artefacts` node + router edge appended with `delta: new`, beat B14, `now` rewritten; 27 nodes / 38 edges / 14 beats): **224 jsdom + 340 real-Chromium assertions** including real pointer/keyboard input (drill-in, ToC filter typing, by-kind link scroll) per the v1.2.1 doctrine, noscript completeness, backward compat without `meta.toc`/`meta.moc`, and a second run leaving the output directory byte-identical with zero new files. `build-plugin.py --check-only` CHECK PASS 18 skills, 0 warnings; `coeus_full_test.py` ALL TESTS PASS.
+
+---
+
 ## 2026-Sep-08 (v3.24.1) · Skill catalog, landing-page visual revamp, validator fix, single-branch policy
 
 ### Changed — repository now single-branch

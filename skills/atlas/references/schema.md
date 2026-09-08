@@ -2,11 +2,12 @@
 
 > The structured intermediate for `skills/atlas/`. Written to `Outputs/atlas.json`,
 > then injected into `references/template.html` at `/*__ATLAS_DATA__*/` to produce
-> `Outputs/atlas.html`, and projected to markdown as `Outputs/atlas_moc.md`
-> (§ Master of Content, below). This file is the contract between Phase 1
-> (survey) and both renderers — they read nothing else. All three outputs are
-> created once and updated in place forever; a versioned or timestamped sibling
-> is a defect.
+> `Outputs/atlas.html`, and projected twice more — to markdown as
+> `Outputs/atlas_moc.md` (§ Master of Content) and to a navigable page as
+> `Outputs/atlas_toc.html` (§ Table of Contents). This file is the contract
+> between Phase 1 (survey) and every renderer — they read nothing else. All
+> four outputs are created once and updated in place forever; a versioned or
+> timestamped sibling is a defect.
 
 Encoding UTF-8, no BOM. Unknown top-level keys are ignored by the template;
 missing optional keys degrade gracefully (the region renders with a marked gap,
@@ -33,9 +34,10 @@ never a crash).
 |---|---|---|---|
 | `project` | string | yes | Display name, header strip |
 | `generated` | string | yes | ISO-8601 date or datetime of this build |
-| `atlas_version` | string | yes | Schema/generator version, `"1.2.0"` for this release |
+| `atlas_version` | string | yes | Schema/generator version, `"1.3.0"` for this release |
 | `sources[]` | array of object | yes | Every mined source. `{kind, path, note?}` where `kind` ∈ `handover \| artefacts_index \| telemetry \| git \| readme \| changelog \| docs \| filesystem \| interview \| user` |
 | `moc` | string | no | Filename of the Master of Content beside `atlas.html`, normally `"atlas_moc.md"`. Its presence is what makes the atlas render a companion-index link in its header strip; omit it and the page renders exactly as it did before 1.2.0 |
+| `toc` | string | no | Filename of the visual table of contents beside `atlas.html`, normally `"atlas_toc.html"`. Its presence is what makes the atlas render a **Contents** link in its header strip; omit it and the page renders exactly as it did before 1.3.0 |
 
 `sources[]` is the traceability spine: nothing may appear in `frame`, `map`, or
 `story` that does not trace to a source entry or an `interview`/`user` answer.
@@ -199,6 +201,8 @@ Sections, in this order:
 [Story](atlas.html#story)
 ```
 
+When `meta.toc` is set, a second line follows: `Visual contents: [atlas_toc.html](atlas_toc.html)`.
+
 The template's Map views are hash-addressable as `#view=overview|list|grid`
 (the bare element ids `#v-overview|#v-list|#v-grid` also work); landing on one
 selects that view and scrolls the Map region into sight. The four region
@@ -258,6 +262,76 @@ appears in the map, never quietly resolved.
 
 ---
 
+## § Table of Contents (visual) — `Outputs/atlas_toc.html`
+
+The **front door**: the file a cold reader opens first. Where `atlas.html`
+shows how the project's parts relate and `atlas_moc.md` writes that down, this
+page exists to *route* — one click from here to any artefact, any region of the
+atlas, or any of its three Map views. Like the MoC it is derived entirely from
+`atlas.json`, regenerated in full on every refresh, and never hand-edited.
+
+Self-contained on the same terms as `atlas.html`: inline CSS and one small
+inline script, **no CDN, no webfont, no network**. That rule outranks any
+house styling advice — a page that needs to reach the network is a failed
+atlas output, so typographic character comes from scale, weight and spacing on
+a system stack, not from a downloaded face.
+
+**Readable with scripting off.** Every artefact, link, heading and count is
+written into the static HTML. The one script on the page adds a filter that
+*hides* rows already present; with JS disabled the filter is not shown and
+nothing else changes. Never generate content client-side here.
+
+Sections, in this order:
+
+**1 · Masthead.** Project name, `frame.intent` as the standfirst, the generated
+date, `atlas_version`, and the artefact / family / relation counts. A quiet
+evergreen note: regenerated in place, one copy, never versioned.
+
+**2 · Visual explainer.** One small hand-authored inline SVG showing the
+mechanism this page sits in — `atlas.json` *renders* `atlas.html` and *derives*
+the MoC and this page, and this page *links to* every artefact. Labels sit on
+the arrows, there is no legend, and the box for this page is the one element
+carrying a literal accent hue ("you are here"). It orients the reader; it does
+not decorate. `<figure>` + `<figcaption>`, `role="img"` and an `aria-label`
+carrying the same claim.
+
+**3 · Quick links.** Labelled chips, never bare URLs, in three rows: the whole
+pages (`atlas.html`, the MoC, `atlas.json`); the four atlas regions (`#frame`,
+`#now`, `#map`, `#story`); and the three Map views (`#view=overview`,
+`#view=list`, `#view=grid`). Each chip names what the reader will find there.
+
+**4 · Artefacts by family.** One card per group in `layout.group_order`, members
+in `layout.node_order`. The card is striped and tinted with the group's palette
+slot — assigned by **position**, `"hue": null` neutral, exactly as the map does
+it, so the two files agree at a glance. Each artefact is a row carrying:
+
+| part | rule |
+|---|---|
+| name | a link when `nodes[].link` is set, using the **same `../` link-base rule** the Master of Content documents; otherwise plain text plus a quiet `no file` mark — truthful, never a dead link |
+| kind | a chip whose corner radius is the kind, the same injective shape channel the map uses |
+| status | dash-styled underline (`unknown` dashed, `draft` dotted, `superseded` double) |
+| `delta` | a badge, on refresh only |
+| desc | on the row, front-loaded |
+| path | the raw `nodes[].link` in a monospace face — the reader is looking for a file |
+
+Colour is never the only channel: family is stripe + tint + heading, kind is
+shape, status is dash. **Every node appears exactly once in this cut.**
+
+**5 · By kind.** A slim second cut — Inputs / Outputs / External / References /
+People — listing the same artefacts as in-page links to `#n-<node id>`, so every
+node is reachable both by family and by kind. Omit a kind with no members.
+
+**6 · Filter (optional, progressive).** A single input; at two characters or
+more it hides non-matching rows and any family left empty. The page is complete
+and readable without it.
+
+Both themes via the three-state token pattern (bare `:root` light palette, a
+`prefers-color-scheme` block guarded with `:root:not([data-theme="light"])`, and
+a `:root[data-theme="dark"]` block), and a print stylesheet that drops the
+filter and lets every card flow.
+
+---
+
 ## Worked example (abridged, valid)
 
 ```json
@@ -265,8 +339,9 @@ appears in the map, never quietly resolved.
   "meta": {
     "project": "Kestrel Field Review",
     "generated": "2026-09-01",
-    "atlas_version": "1.2.0",
+    "atlas_version": "1.3.0",
     "moc": "atlas_moc.md",
+    "toc": "atlas_toc.html",
     "sources": [
       {"kind": "handover", "path": "Outputs/Kestrel_LLM_Handover.md"},
       {"kind": "artefacts_index", "path": "Outputs/artefacts_index.md"},

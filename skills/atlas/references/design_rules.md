@@ -291,15 +291,26 @@ Truthfulness and containment:
 
 Outputs (created once, updated in place):
 
-- [ ] `Outputs/` holds exactly three atlas files — `atlas.json`, `atlas.html`,
-      `atlas_moc.md` — and **no versioned, timestamped, numbered or backup
-      sibling** of any of them (`atlas_v2.html`, `atlas_2026-09-04.json`,
-      `atlas_moc (1).md` …). A second copy is a defect, not a safety net.
-- [ ] `Outputs/atlas_moc.md` exists and was regenerated this run.
-- [ ] Every node in `map.nodes` appears **exactly once** in the MoC's
-      by-group cut — none dropped, none listed twice.
-- [ ] The MoC's links resolve relative to `Outputs/`: `atlas.html` and its
-      `#view=…` / `#story` fragments, plus every `nodes[].link` it reproduces.
+- [ ] `Outputs/` holds exactly four atlas files — `atlas.json`, `atlas.html`,
+      `atlas_moc.md`, `atlas_toc.html` — and **no versioned, timestamped,
+      numbered or backup sibling** of any of them (`atlas_v2.html`,
+      `atlas_2026-09-04.json`, `atlas_moc (1).md` …). A second copy is a defect,
+      not a safety net.
+- [ ] `Outputs/atlas_moc.md` and `Outputs/atlas_toc.html` both exist and were
+      regenerated this run.
+- [ ] Every node in `map.nodes` appears **exactly once** in the MoC's by-group
+      cut and **exactly once** in the ToC's by-family cut — none dropped, none
+      listed twice — and every node is also reachable from the ToC's by-kind cut.
+- [ ] Their links resolve relative to `Outputs/`: `atlas.html` and its
+      `#view=…` / `#story` fragments, plus every `nodes[].link` they reproduce
+      under the `../` link-base rule. A node with no `link` is marked as having
+      no file rather than given a dead one.
+- [ ] The ToC reads **completely with scripting off** — every artefact, count
+      and link is in the static HTML; the script only filters. Check by reading
+      the source, not by running it.
+- [ ] The ToC carries the three-state theme tokens and a print stylesheet, and
+      encodes family / kind / status with stripe, shape and dash as well as
+      colour — it must survive monochrome like the map does.
 - [ ] If the run was a refresh, it said so before writing.
 
 ---
