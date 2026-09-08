@@ -2,7 +2,10 @@
 
 ---
 
-## 2026-Sep-08 (v3.24.0 follow-up) · Skill catalog, landing-page visual revamp, validator fix
+## 2026-Sep-08 (v3.24.1) · Skill catalog, landing-page visual revamp, validator fix, single-branch policy
+
+### Changed — repository now single-branch
+All side branches were fully merged and deleted (local + remote): feat/nas-artefacts, claude/paper-research-coeus-claude-n81j9u, claude/project-visualization-tool-5acsjd. Zero unique commits lost — verified with `git log main..<branch>` before deletion. Policy: main only; feature branches are short-lived and deleted on merge.
 
 ### Added — docs/SKILLS.md: the full skill catalog, human-first
 One crafted paragraph per skill — all 18, organized by family (decision 8 · writing 1 · tools 6 · seismic 1 · vault 1 · meta 1) with version, tier, slash command, dependencies, and a family map. Surfaced as a new "Skills" tab on the landing page. Frontmatter stays canonical for triggers; this page is canonical for understanding.
