@@ -12,7 +12,7 @@
 
 ## What Coeus is
 
-Coeus is a **Claude Code plugin** that bundles 17 skills for high-stakes EP-industry decision-making, plugin authoring, meta-routing, upstream subsurface data extraction, direct Obsidian-vault file operations (the **vault** family, v3.16.0), Minto pyramid-principle document structuring (the **writing** family, v3.19.0), and Project Atlas generation (`atlas`, v3.21.0):
+Coeus is a **Claude Code plugin** that bundles 18 skills for high-stakes EP-industry decision-making, plugin authoring, meta-routing, upstream subsurface data extraction, direct Obsidian-vault file operations (the **vault** family, v3.16.0), Minto pyramid-principle document structuring (the **writing** family, v3.19.0), and Project Atlas generation (`atlas`, v3.21.0):
 
 | Skill | Purpose | Slash command |
 |---|---|---|

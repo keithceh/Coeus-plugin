@@ -4,7 +4,7 @@ version: 1.7.0
 argument-hint: "[task — a decision, plan, prompt, deal, file, vault note, document to structure, or skill question]"
 description: >-
   Trigger on: /coeus:router, /coeus-router, "route this", "which coeus skill", "pick the right coeus skill", "coeus help me decide", "not sure which coeus", "coeus guru", "skill selector".
-  Tier-3 meta-skill router across five families: decision, tools (ooxml, lifecycle, atlas), seismic, vault, writing. Use when the user wants a Coeus skill but doesn't know which.
+  Tier-3 meta-skill router across five families: decision, tools (ooxml, lifecycle, atlas, evergreen-artefacts), seismic, vault, writing. Use when the user wants a Coeus skill but doesn't know which.
 dependencies:
   - llm-council
   - ep-council
@@ -22,6 +22,7 @@ dependencies:
   - minto
   - seer
   - atlas
+  - evergreen-artefacts
 ---
 
 # Coeus Router — Tier-3 Meta-Skill
@@ -94,6 +95,7 @@ Match in this order. First match wins.
 | Wants a figure or table inventory extracted from a DOCX to xlsx, a caption audit, or a list of all figures/tables | `docx-inventory` | `/coeus:docx-inventory` |
 | Is about resuming a multi-session project, writing or updating a handover note, updating a changelog, or auditing project files for obsolescence | `project-lifecycle` | `/coeus:project-lifecycle` |
 | Wants a project explained visually or at a glance — "project atlas", "project map", "map my project", "visualise/explain this project", an interactive overview of what a project is, contains, and how it got here | `atlas` | `/coeus:atlas` |
+| Wants an artefact published or shared on the NAS — "publish to NAS", "push this artefact", "share this on the NAS", "new version of <artefact>", "evergreen link", "revert artefact to v<N>" | `evergreen-artefacts` | `/coeus:evergreen-artefacts` |
 
 ### Step 2c — Skill Within `seismic`
 

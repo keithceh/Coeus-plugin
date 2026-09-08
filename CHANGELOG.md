@@ -2,7 +2,32 @@
 
 ---
 
-## 2026-Sep-04 (v3.23.1) · 2026-Sep-04 06:02 · atlas v1.2.1 — fix: Overview drill-in dead to real mouse clicks (pointer-capture bug)
+## 2026-Sep-08 (v3.24.0 follow-up) · Skill catalog, landing-page visual revamp, validator fix
+
+### Added — docs/SKILLS.md: the full skill catalog, human-first
+One crafted paragraph per skill — all 18, organized by family (decision 8 · writing 1 · tools 6 · seismic 1 · vault 1 · meta 1) with version, tier, slash command, dependencies, and a family map. Surfaced as a new "Skills" tab on the landing page. Frontmatter stays canonical for triggers; this page is canonical for understanding.
+
+### Changed — landing page visual revamp (build-index-html.py)
+Applied taste/design-pass principles to the generator CSS: refined type scale with tighter letter-spacing and a 76ch reading measure, underline-bar active nav with focus-visible states, zebra-striped borderless tables (sticky headers, rounded frames) replacing full grid borders, softer card/blockquote surfaces, selection color, scroll-margin anchors, fade-in panel transitions with prefers-reduced-motion support, brand dot accent. Single committed dark look retained.
+
+### Fixed — evergreen-artefacts description tripped the Desktop XML-token validator
+The literal "<artefact>" in a trigger phrase would be rejected on install (v3.5.1 regression class, caught by the harness). Now "[artefact]".
+
+### Fixed — skill-count drift (17 vs 18)
+README (2), docs/Installation.md (3), handover header — all now say 18. Stale dist bundle rebuilt (was missing seer/atlas/evergreen-artefacts); harness now 266/266.
+
+---
+
+## 2026-Sep-08 (v3.24.0) · evergreen-artefacts v1.0.0 — agent-neutral evergreen publishing to a Synology NAS
+
+### Added — `evergreen-artefacts` skill (family: tools, Tier 1)
+Folded in from Keith's user-level `nas-artifacts` skill (built and smoke-tested 2026-09-07, renamed to the house spelling). One PowerShell script (`publish-artefact.ps1`) plus an agent-neutral `HANDOVER.md` contract — any LLM (Claude, ChatGPT, Codex, Cursor) or human publishes the same way. Design distills the concepts worth keeping from a security review of plannotator/artifact-server without running any server: **evergreen link** (redirect stub per artefact, always points at the latest version), **immutable versions** (`vN/` folders, never edited or deleted), **attribution + integrity** (`publish.json` per version: publisher, ISO timestamp, per-file SHA-256), and **revert as a new version** (`-RevertTo N` republishes old content with `revertOf` recorded — audit-correct, nothing lost). All file types: HTML and Markdown render in-browser (MD via a generated marked-CDN viewer with plain-text offline fallback); Office/PDF evergreen links download the latest file. Two-zone trust model documented in the contract: Synology Drive team folder for collaborative editing (DSM accounts, Drive versioning, Log Center audit), Web Station static serve over Tailscale for published versions — nothing internet-facing.
+
+### Registered
+Registry row, coeus-router dependency list + routing-table row, README skill row + command row, plugin.json 3.24.0.
+
+### Validation
+Smoke tests (run against a temp root, 2026-09-07/08): two HTML publishes → evergreen flips v1→v2; Markdown publish → viewer stub with offline fallback; filename with `&` and spaces → correctly URL-escaped redirect; publish.json publisher + 64-hex sha256 asserted; revert v3→v1 content byte-identical as v4 with `revertOf: v1` and recomputed hashes; prior versions untouched; `-RevertTo` without `-Name` rejected. Known fix baked in: `Get-ChildItem -Exclude` without wildcard path returns nothing on pwsh — replaced with `Where-Object`. NAS-side defaults (`\\192.168.0.119\web\artefacts`, `http://192.168.0.119/artefacts`) remain to be verified against Web Station on first real publish. · 2026-Sep-04 06:02 · atlas v1.2.1 — fix: Overview drill-in dead to real mouse clicks (pointer-capture bug)
 
 ### Fixed — group boxes never received a human's click; member panel and ego view unreachable from the Overview
 User-reported: clicking a group box in the Map's Overview did nothing, so the member panel → ego view drill-in was unreachable by mouse. Root cause: the pan handler called `setPointerCapture` on **pointerdown**, unconditionally — once the wrapper captures the pointer, the browser retargets the subsequent `click` to the capturing element, so `g.gbox`'s click handler never fired on real input. Shipped in v3.22.0 and v3.23.0. **Why every test passed anyway:** the browser-leg tests drove clicks with synthetic `dispatchEvent(new MouseEvent('click'))`, which bypasses pointer capture entirely. Reproduced with real Playwright mouse input (fails on both 1280px and 420px viewports), then fixed: capture now waits until an actual drag is detected (movement > 4px); a plain click or a 2px human-wobble click reaches the group box, a real drag still pans and still does not misfire as a click. A code comment marks the trap ("do not simplify this back").

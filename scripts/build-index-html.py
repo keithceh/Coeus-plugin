@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SECTIONS = [
     ("readme",         "Overview",            ROOT / "README.md",                            None),
     ("installation",   "Installation",        ROOT / "docs/Installation.md",                 None),
+    ("skills",         "Skills",              ROOT / "docs/SKILLS.md",                       None),
     ("ep-council",     "EP-Council",          ROOT / "docs/EP-Council.md",                   None),
     ("ep-members",     "EP Council Members",  ROOT / "docs/EP-Council-Council-Members.md",   "ep-council"),
     ("ep-traps",       "EP Trap Screen",      ROOT / "docs/EP-Council-Trap-Screen.md",       "ep-council"),
@@ -52,47 +53,98 @@ sections = "\n".join(
 )
 
 CSS = """
-:root{--bg:#0f1116;--fg:#e6e7ea;--mut:#9aa0a6;--acc:#f4b400;--card:#161922;--bd:#262a36;--code:#0b0d12}
+:root{
+  --bg:#0e1015;--bg2:#12151d;--fg:#e8eaee;--mut:#98a0ab;--acc:#f2b63c;--acc2:#7cb1ff;
+  --card:#171b24;--bd:#252a37;--bd2:#2e3444;--code:#0a0c11;
+  --r:10px;--maxw:1080px;
+}
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-header{position:sticky;top:0;background:rgba(15,17,22,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--bd);z-index:50}
-.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
-.brand{display:flex;align-items:center;gap:12px;padding:14px 0}
-.brand h1{margin:0;font-size:18px;letter-spacing:.5px}
-.brand .v{color:var(--mut);font-size:13px}
-nav{display:flex;gap:4px;overflow-x:auto;padding-bottom:8px}
-.tab{padding:8px 14px;border-radius:8px;color:var(--mut);text-decoration:none;font-size:14px;white-space:nowrap;border:1px solid transparent}
-.tab:hover{color:var(--fg);background:var(--card)}
-.tab.active{color:var(--acc);background:var(--card);border-color:var(--bd)}
-main{padding:32px 0 64px}
-.panel{display:none;max-width:1080px;margin:0 auto;padding:0 24px}
-.panel.active{display:block}
-.panel h1,.panel h2,.panel h3,.panel h4{line-height:1.25;margin:1.6em 0 .6em}
-.panel h1{font-size:28px;border-bottom:1px solid var(--bd);padding-bottom:.3em}
-.panel h2{font-size:22px;color:#fff}
-.panel h3{font-size:18px;color:var(--acc)}
-.panel a{color:#7cb1ff}
-.panel a:hover{text-decoration:underline}
-.panel code{background:var(--code);padding:2px 6px;border-radius:4px;font:13px ui-monospace,SFMono-Regular,Menlo,monospace}
-.panel pre{background:var(--code);padding:14px;border-radius:8px;border:1px solid var(--bd);overflow-x:auto}
-.panel pre code{background:transparent;padding:0}
-.panel table{border-collapse:collapse;width:100%;margin:1em 0;font-size:14px}
-.panel th,.panel td{border:1px solid var(--bd);padding:8px 10px;text-align:left;vertical-align:top}
-.panel th{background:var(--card)}
-.panel blockquote{border-left:3px solid var(--acc);margin:1em 0;padding:.4em 1em;color:var(--mut);background:var(--card)}
-.panel hr{border:0;border-top:1px solid var(--bd);margin:2em 0}
-.panel img{max-width:100%;height:auto;border-radius:8px}
-footer{color:var(--mut);font-size:13px;text-align:center;padding:24px;border-top:1px solid var(--bd)}
-.backbar{display:none;max-width:1080px;margin:0 auto 16px;padding:10px 24px;background:var(--card);border:1px solid var(--bd);border-radius:8px;font-size:14px}
+::selection{background:rgba(242,182,60,.28)}
+html{scroll-behavior:smooth}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+header{position:sticky;top:0;z-index:50;background:rgba(14,16,21,.88);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--bd)}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+.brand{display:flex;align-items:baseline;gap:12px;padding:16px 0 10px}
+.brand h1{margin:0;font-size:19px;font-weight:700;letter-spacing:.04em}
+.brand h1::after{content:"";display:inline-block;width:7px;height:7px;margin-left:9px;
+  border-radius:50%;background:var(--acc);vertical-align:baseline}
+.brand .v{color:var(--mut);font-size:13px;letter-spacing:.01em}
+
+nav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+.tab{position:relative;padding:9px 13px 12px;color:var(--mut);text-decoration:none;
+  font-size:14px;font-weight:500;white-space:nowrap;border-radius:7px 7px 0 0;
+  transition:color .15s}
+.tab:hover{color:var(--fg)}
+.tab:focus-visible{outline:2px solid var(--acc2);outline-offset:-2px}
+.tab.active{color:var(--fg)}
+.tab.active::after{content:"";position:absolute;left:11px;right:11px;bottom:0;height:2px;
+  background:var(--acc);border-radius:2px 2px 0 0}
+
+main{padding:36px 0 72px}
+.panel{display:none;max-width:var(--maxw);margin:0 auto;padding:0 24px}
+.panel.active{display:block;animation:fadein .18s ease-out}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.panel.active{animation:none}}
+
+.panel h1,.panel h2,.panel h3,.panel h4{line-height:1.25;letter-spacing:-.01em}
+.panel h1{font-size:30px;font-weight:750;margin:1.2em 0 .55em;
+  border-bottom:1px solid var(--bd);padding-bottom:.35em}
+.panel>h1:first-child{margin-top:.2em}
+.panel h2{font-size:22px;font-weight:700;color:#fff;margin:2em 0 .6em}
+.panel h3{font-size:17.5px;font-weight:650;color:var(--acc);margin:1.7em 0 .5em}
+.panel h4{font-size:15.5px;color:var(--fg);margin:1.5em 0 .4em}
+.panel p,.panel li{max-width:76ch}
+.panel [id]{scroll-margin-top:110px}
+
+.panel a{color:var(--acc2);text-decoration:none}
+.panel a:hover{text-decoration:underline;text-underline-offset:3px}
+
+.panel code{background:var(--code);border:1px solid var(--bd);padding:2px 6px;border-radius:5px;
+  font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.panel pre{background:var(--code);padding:15px 17px;border-radius:var(--r);
+  border:1px solid var(--bd);overflow-x:auto;line-height:1.55}
+.panel pre code{background:transparent;border:0;padding:0}
+
+.panel table{border-collapse:collapse;width:100%;margin:1.2em 0;font-size:14px;
+  border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;display:block;overflow-x:auto}
+.panel thead{position:sticky;top:0}
+.panel th{background:var(--card);color:var(--fg);font-weight:650;text-align:left;
+  padding:10px 12px;border-bottom:2px solid var(--bd2)}
+.panel td{padding:9px 12px;border-bottom:1px solid var(--bd);text-align:left;vertical-align:top}
+.panel tbody tr:nth-child(even){background:var(--bg2)}
+.panel tbody tr:last-child td{border-bottom:0}
+
+.panel blockquote{border-left:3px solid var(--acc);margin:1.2em 0;
+  padding:.7em 1.1em;color:var(--mut);background:var(--card);
+  border-radius:0 var(--r) var(--r) 0}
+.panel blockquote p{margin:.3em 0}
+.panel hr{border:0;border-top:1px solid var(--bd);margin:2.4em 0}
+.panel img{max-width:100%;height:auto;border-radius:var(--r)}
+.panel ul,.panel ol{padding-left:1.4em}
+.panel li{margin:.25em 0}
+
+footer{color:var(--mut);font-size:13px;text-align:center;padding:28px 24px;
+  border-top:1px solid var(--bd)}
+footer a{color:var(--mut)}
+footer a:hover{color:var(--fg)}
+
+.backbar{display:none;max-width:var(--maxw);margin:0 auto 18px;padding:10px 24px;
+  background:var(--card);border:1px solid var(--bd);border-radius:var(--r);font-size:14px}
 .backbar.show{display:block}
-.backbar a{color:var(--acc);text-decoration:none;cursor:pointer}
+.backbar a{color:var(--acc);text-decoration:none;cursor:pointer;font-weight:550}
 .backbar a:hover{text-decoration:underline}
 """
 
 JS = """
 const tabs=[...document.querySelectorAll('.tab')];
 const panels=[...document.querySelectorAll('.panel')];
-const MAIN_TABS=['readme','installation','ep-council','llm-council','tools','project-lifecycle','seismic-tools'];
+const MAIN_TABS=['readme','installation','skills','ep-council','llm-council','tools','project-lifecycle','seismic-tools'];
 const SUB_PARENT={
   'ep-members':'ep-council',
   'ep-traps':'ep-council',
@@ -117,6 +169,8 @@ const MD2TAB={
   'docs/Tools.md':'tools',
   'docs/Seismic-Tools.md':'seismic-tools',
   'docs/Installation.md':'installation',
+  'docs/SKILLS.md':'skills',
+  'SKILLS':'skills',
   'Installation':'installation',
   'docs/Project-Lifecycle.md':'project-lifecycle',
   'Project-Lifecycle':'project-lifecycle',
