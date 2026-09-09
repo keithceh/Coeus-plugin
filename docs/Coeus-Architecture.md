@@ -59,7 +59,7 @@ Tier 1 — Nano-skill                 │ Family: decision
 Tier 2 — Cluster skill              │ Family: tools
   └─ 2-4 related skills merged      │   ooxml-repair, ooxml-fields,
   └─ Reads _shared/ for common rules│   docx-inventory, project-lifecycle*,
-  └─ Hard cap: 3,000 tokens         │   atlas
+  └─ Hard cap: 3,000 tokens         │   atlas, keymaker*
                                     │ Family: seismic
                                     │   dug_binary
 Tier 3 — Meta-skill (router)        │ Family: vault

@@ -1,7 +1,7 @@
 {
   "name": "coeus",
-  "version": "3.25.0",
-  "description": "E&P-industry skill suite for high-stakes decisions: LLM-Council multi-model deliberation, EP-Council 9-supermajor adversarial deal review, Morpheus prompt pipeline, The Architect combo, Plugin-Creator, Coeus-Router, Seer routing evals, Project-Lifecycle, Atlas project maps, Minto pyramid structuring, Office Tools (OOXML repair/fields/inventory), Seismic Tools (dug_binary: DUG Insight project extraction), Evergreen-Artefacts NAS publishing, plus bundled Caveman and Prompt-Master.",
+  "version": "3.26.0",
+  "description": "E&P-industry skill suite for high-stakes decisions: LLM-Council multi-model deliberation, EP-Council 9-supermajor adversarial deal review, Morpheus prompt pipeline, The Architect combo, Plugin-Creator, Coeus-Router, Seer routing evals, Project-Lifecycle, Keymaker end-to-end project passes, Atlas project maps, Minto pyramid structuring, Office Tools (OOXML repair/fields/inventory), Seismic Tools (dug_binary: DUG Insight project extraction), Evergreen-Artefacts NAS publishing, plus bundled Caveman and Prompt-Master.",
   "author": {
     "name": "ENERGEIA SERVICES PTE. LTD.",
     "url": "https://github.com/keithceh/Coeus"

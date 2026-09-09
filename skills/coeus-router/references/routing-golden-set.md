@@ -39,6 +39,10 @@ Format: outcome is `family/skill`, `CLARIFIER(a|b)`, `NO ROUTE`, or `BYPASS`.
 | 29 | "how does the router decide between families?" | NO ROUTE (question about Coeus, answer directly) | rule 12 border — ask/explain vs test/evaluate |
 | 30 | "give me a project map — an at-a-glance view of the Thornbury project" | tools/atlas | 2b atlas row — see the project |
 | 31 | "resume my project" | tools/project-lifecycle | rule 13 border — operate the session, not visualise it |
+| 32 | "give this project the full pass — refresh the handover, the atlas, and tidy every visual" | tools/keymaker | 2b keymaker row + rule 14 |
+| 33 | "visualise this project and update the handover" | tools/keymaker | rules 9 + 14 — combo skill preferred over sequential (supersedes the pre-1.8.0 sequential label in rule 13's example) |
+| 34 | "just refresh the atlas" | tools/atlas | rule 14 border — single deliverable stays with its owner |
+| 35 | "keymaker: sweep the Thornbury project deliverables" | BYPASS | Step 0.1 — named skill |
 
 ## Maintenance
 

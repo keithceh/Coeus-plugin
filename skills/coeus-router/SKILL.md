@@ -1,6 +1,6 @@
 ---
 name: coeus-router
-version: 1.7.0
+version: 1.8.0
 argument-hint: "[task — a decision, plan, prompt, deal, file, vault note, document to structure, or skill question]"
 description: >-
   Trigger on: /coeus:router, /coeus-router, "route this", "which coeus skill", "pick the right coeus skill", "coeus help me decide", "not sure which coeus", "coeus guru", "skill selector".
@@ -23,6 +23,7 @@ dependencies:
   - seer
   - atlas
   - evergreen-artefacts
+  - keymaker
 ---
 
 # Coeus Router — Tier-3 Meta-Skill
@@ -32,8 +33,7 @@ analysis, no compression, no deliberation logic. Its sole job is to read the
 user's request, pick the correct Coeus skill, and **launch it** (see Output
 Format). A route that names a skill but does not launch it is incomplete.
 
-If you find yourself producing analysis here, stop — you have routed to the
-wrong skill. Re-route.
+Producing analysis here means you routed wrong — re-route.
 
 ---
 
@@ -44,19 +44,19 @@ wrong skill. Re-route.
 Three outcomes, checked before any family matching:
 
 1. **BYPASS** — the user already named a Coeus skill (slash command or by name). Launch that skill directly; emit no routing block.
-2. **NO ROUTE** — the request needs no Coeus skill (general chat, a coding task, a question about Coeus itself, a follow-up to an already-routed skill). Say so in one line and answer normally. Never force a route to justify the router's existence — a confidently wrong route costs more than "no skill needed here."
+2. **NO ROUTE** — the request needs no Coeus skill (general chat, a coding task, a question about Coeus itself, a follow-up to an already-routed skill). Say so in one line and answer normally.
 3. **PROCEED** — a Coeus skill plausibly applies. Continue to Step 1.
 
 ### Steps 1–2 — Family, then skill
 
-The router decides in two steps. **Step 1: which family.** **Step 2: which skill inside that family.** This keeps the table O(n) per family rather than O(n²) across the whole plugin, lets new families be added without rewriting existing rules, and keeps the skill list the model weighs per decision small (the catalog-degradation threshold documented for LLM tool selection is ~15–20 candidates; family-first keeps each step well under it).
+The router decides in two steps. **Step 1: which family.** **Step 2: which skill inside that family.** This keeps each step's candidate list small (the documented catalog-degradation threshold for LLM tool selection is ~15–20 candidates) and lets new families be added without rewriting existing rules. Every Step-2 table matches top-down; first match wins.
 
 ### Step 1 — Pick the Family
 
 | If the request mentions… | Family |
 |---|---|
 | A DUG Insight project (`project.dugprj`, `.dugprj`), horizons / polygons / volumes / processes from a seismic project, OpendTect-style audit, or "what's in this DUG project" | **seismic** |
-| A DOCX/Word file, OOXML, SEQ/REF fields, figure/table captions, "fix Word", "audit captions", "figure inventory", a project handover / session resume / file audit, or a visual map / at-a-glance explanation of a whole project | **tools** |
+| A DOCX/Word file, OOXML, SEQ/REF fields, figure/table captions, "fix Word", "audit captions", "figure inventory", a project handover / session resume / file audit, or a visual map / at-a-glance explanation of a whole project, or an end-to-end pass over a whole project's deliverables | **tools** |
 | A decision, plan, strategy, deal, prompt, compression, council, premortem, red-team, plugin packaging, or "stress-test" anything | **decision** |
 | An Obsidian vault, vault notes, `.obsidian`, note tags (add/remove/rename), "search my vault", or moving/deleting notes | **vault** |
 | Structuring or restructuring a memo, report, proposal, recommendation, update, or deck storyline for a reader — "pyramid", "Minto", "SCQ", answer-first / lead-with-the-answer requests, or a structural review of an existing document | **writing** |
@@ -71,8 +71,6 @@ and stop.
 
 ### Step 2a — Skill Within `decision`
 
-Match in this order. First match wins.
-
 | If the request… | Route to | Trigger phrase to emit |
 |---|---|---|
 | Concerns an upstream E&P opportunity (block, well, farm-in, FID, FLNG, JV, divestment, supermajor playbook) | `ep-council` | `/coeus:ep-council` |
@@ -86,10 +84,9 @@ Match in this order. First match wins.
 
 ### Step 2b — Skill Within `tools`
 
-Match in this order. First match wins.
-
 | If the request… | Route to | Trigger phrase to emit |
 |---|---|---|
+| Wants the whole project driven end-to-end — lifecycle AND atlas chained, every deliverable coordinated or refreshed, visual artefacts swept to the quality bar — "keymaker", "full project pass", "refresh every deliverable", "coordinate all deliverables". Checked first because it is the most specific multi-signal row; a single-deliverable ask falls through (rule 14) | `keymaker` | `/coeus:keymaker` |
 | Mentions DOCX corruption, "unreadable content" dialog, ZIP rebuild errors, OOXML schema violations, orphaned bookmarks/comments, duplicate style IDs | `ooxml-repair` | `/coeus:ooxml-repair` |
 | Concerns SEQ fields, REF fields, figure/table caption numbering, hardcoded caption numbers, broken cross-references | `ooxml-fields` | `/coeus:ooxml-fields` |
 | Wants a figure or table inventory extracted from a DOCX to xlsx, a caption audit, or a list of all figures/tables | `docx-inventory` | `/coeus:docx-inventory` |
@@ -99,39 +96,27 @@ Match in this order. First match wins.
 
 ### Step 2c — Skill Within `seismic`
 
-Match in this order. First match wins.
-
 | If the request… | Route to | Trigger phrase to emit |
 |---|---|---|
 | Names a DUG Insight `project.dugprj` or `.dugprj` file, asks to list horizons / polygons / volumes from a DUG project, audit per-volume processes, map volume lineage, or extract DUG project contents to xlsx / DOCX / HTML explorer | `dug_binary` | `/coeus:dug_binary` |
 
-(More seismic skills will be added here as the family grows.)
-
 ### Step 2d — Skill Within `vault`
-
-Match in this order. First match wins.
 
 | If the request… | Route to | Trigger phrase to emit |
 |---|---|---|
 | Concerns an Obsidian vault — reading, searching, creating, editing, tagging, moving, or deleting notes, including on a NAS/UNC/mapped-drive vault path | `obsidian-vault` | `/coeus:obsidian-vault` |
 
-(More vault skills will be added here as the family grows.)
-
 ### Step 2e — Skill Within `writing`
-
-Match in this order. First match wins.
 
 | If the request… | Route to | Trigger phrase to emit |
 |---|---|---|
 | Wants a memo, report, proposal, recommendation, gate submission, update, or deck storyline structured, restructured, or reviewed against answer-first / pyramid logic | `minto` | `/coeus:minto` |
 
-(More writing skills will be added here as the family grows.)
-
 ---
 
 ## Tie-Breaker Rules
 
-0. **Family first.** Always run Step 1 before Step 2. A request that contains a DOCX path goes to `tools` even if it also contains the word "decision". A request that contains "farm-in" goes to `decision` even if the user attached a DOCX.
+0. **Family first.** Always run Step 1 before Step 2. A request containing a DOCX path goes to `tools` even if it also says "decision"; one saying "farm-in" goes to `decision` even with a DOCX attached.
 1. **E&P vs general decision:** E&P always wins inside `decision` if any E&P terminology is present. `llm-council` is the fallback for non-E&P decisions.
 2. **Architect vs Council:** Pick `the-architect` only if the user's raw input is **also a prompt that needs engineering** (not already a well-formed brief). If the brief is already crisp, route straight to `llm-council`.
 3. **Morpheus vs prompt-master alone:** Pick `morpheus` only if compression is wanted; otherwise `prompt-master` alone.
@@ -144,7 +129,8 @@ Match in this order. First match wins.
 10. **Three-tier confidence fallback:** (a) clear signal → route and launch; (b) two skills tie after all rules → one-line clarifier naming both, user picks, then route — one clarifier max; (c) no family signal at all → NO ROUTE (Step 0 outcome 2), never a guess. A router that always picks something is more dangerous than one that says it can't.
 11. **`minto` (writing) vs `decision` family:** If the user needs the decision itself made or stress-tested ("should we…", "is this investible", "weigh the options"), route `decision` — even if a document is the eventual output. If the decision exists and the request is to communicate or structure it ("structure the board memo recommending X", "restructure this report"), route `writing`. A request for both is sequential (rule 9): decision first, name `minto` as the next step. Handover notes, changelogs, and session docs stay with `project-lifecycle` (rule 6) — never `minto`.
 12. **`seer` vs NO ROUTE (questions about Coeus):** An informational question about Coeus or its skills ("which skill does X?", "how does the router decide?") stays NO ROUTE per Step 0 — answer it directly. A request to *test, evaluate, grade, or generate scenarios for* Coeus routing is a task, not a question: route `decision/seer`. The verb decides — ask/explain → NO ROUTE; test/evaluate/grade/synthesize → `seer`.
-13. **`atlas` vs `project-lifecycle` vs `dug_binary`:** All three touch "a project". The **deliverable** decides. Wants to *see* the project — a map, an at-a-glance overview, "explain this project visually" → `atlas` (it reads the lifecycle files; it never writes them). Wants to *operate* the session — resume, handover, changelog, file-obsolescence audit → `project-lifecycle`. Names a `.dugprj` or asks for seismic volume lineage → `dug_binary` per rule 7, even when the word "map" appears ("map volume lineage" is `dug_binary`, "map my project" is `atlas`). "Visualise this project **and** update the handover" is sequential per rule 9: `atlas` first, name `project-lifecycle` next. A request for one diagram, or for a reasoning/decision graph, is neither — that is NO ROUTE, drawn inline.
+13. **`atlas` vs `project-lifecycle` vs `dug_binary`:** All three touch "a project". The **deliverable** decides. Wants to *see* the project — a map, an at-a-glance overview, "explain this project visually" → `atlas` (it reads the lifecycle files; it never writes them). Wants to *operate* the session — resume, handover, changelog, file-obsolescence audit → `project-lifecycle`. Names a `.dugprj` or asks for seismic volume lineage → `dug_binary` per rule 7, even when the word "map" appears ("map volume lineage" is `dug_binary`, "map my project" is `atlas`). "Visualise this project **and** update the handover" is no longer sequential: `keymaker` is the Tier-2 combo that chains both (rule 9's combo preference) — route `tools/keymaker`. A request for one diagram, or for a reasoning/decision graph, is neither — that is NO ROUTE, drawn inline.
+14. **`keymaker` vs its doors (`atlas` / `project-lifecycle` / `evergreen-artefacts`):** one deliverable named → the owner skill, always ("just refresh the atlas" → `atlas`; "update the handover" → `project-lifecycle`; "publish this" → `evergreen-artefacts`). Two or more deliverable classes, an explicit end-to-end / sweep / whole-project ask, or lifecycle + atlas chained in one request → `keymaker` (rule 9 combo preference). A first-time single-artefact build is never keymaker.
 
 ---
 
@@ -163,12 +149,11 @@ For Step 0 outcome NO ROUTE, emit one line — `NO ROUTE → <reason>` — then 
 
 **Then, in the same response, launch the routed-to skill by calling the Skill
 tool: `Skill(skill="coeus:<skill-name>", args="<the user's task>")`.** The
-`RUN →` line is for the user's reference only — slash commands printed in
-model output are inert text; they only fire when the *user* types them.
-Emitting the block without the Skill-tool call is a routing failure.
+`RUN →` line is for the user's reference only — printed slash commands are
+inert until the *user* types them. Emitting the block without the Skill-tool
+call is a routing failure.
 
-Do not summarise what the target skill is going to do — let the target skill
-speak for itself.
+Do not summarise what the target skill will do.
 
 ---
 

@@ -23,7 +23,7 @@ Cowork and Claude Desktop chat can install a plugin straight from a public GitHu
 1. Open **Settings → Capabilities → Customize → Add Plugin**
 2. Choose **From GitHub** (the repo-URL input)
 3. Enter: `keithceh/Coeus-plugin`
-4. Confirm. All 18 skills register — type `/coeus:` in chat to verify.
+4. Confirm. All 19 skills register — type `/coeus:` in chat to verify.
 
 **Updates:** re-run the same flow after a new release (or remove + re-add). The mirror repo always carries the latest tagged release.
 
@@ -81,7 +81,7 @@ A File Explorer window will open at `Downloads\Coeus-skills\`.
 /reload-plugins
 ```
 
-Verify by typing `/coeus:` — you should see a popup listing all 18 skills.
+Verify by typing `/coeus:` — you should see a popup listing all 19 skills.
 
 **Step 4 (Cowork only).** Drag any `.skill` file from the open Explorer window into the Cowork chat panel. One drag per chat session. Cowork doesn't persist plugin state across restart yet (Anthropic [#40600](https://github.com/anthropics/claude-code/issues/40600)).
 
@@ -125,7 +125,7 @@ That's a counting quirk in Claude Code's reload output. Verify the install actua
 ls $env:USERPROFILE\.claude\plugins\cache\coeus\coeus\
 ```
 
-You should see a version dir containing `skills/`, `hooks/`, `scripts/`, and `.claude-plugin/`. Then in `claude` type `/coeus:` — the popup should show all 18 skills.
+You should see a version dir containing `skills/`, `hooks/`, `scripts/`, and `.claude-plugin/`. Then in `claude` type `/coeus:` — the popup should show all 19 skills.
 
 ### Cowork doesn't see Coeus after `/plugin install`
 

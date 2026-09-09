@@ -12,7 +12,7 @@
         "source": "github",
         "repo": "keithceh/Coeus-plugin"
       },
-      "description": "12-skill suite: llm-council, ep-council, the-architect, morpheus, prompt-master, caveman, plugin-creator, coeus-router, ooxml-repair, ooxml-fields, docx-inventory, project-lifecycle.",
+      "description": "19-skill suite: llm-council, ep-council, the-architect, morpheus, prompt-master, caveman, plugin-creator, seer, coeus-router, ooxml-repair, ooxml-fields, docx-inventory, project-lifecycle, atlas, evergreen-artefacts, keymaker, dug_binary, obsidian-vault, minto.",
       "category": "decision-support",
       "tags": ["council", "ep-industry", "prompt-engineering", "docx", "lifecycle"]
     }

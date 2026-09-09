@@ -129,6 +129,9 @@ Bundled as one umbrella so a user thinking *"I have a DOCX problem and a project
 - [OOXML Fields → full SKILL.md](Tools-OOXML-Fields)
 - [DOCX Inventory → full SKILL.md](Tools-DOCX-Inventory)
 - [Project Lifecycle → full SKILL.md](Tools-Project-Lifecycle)
+- [Keymaker →](Keymaker.md)
+- [Atlas →](Atlas.md)
+- [Evergreen Artefacts →](Evergreen-Artefacts.md)
 - [Coeus README →](../README.md)
 
 ---

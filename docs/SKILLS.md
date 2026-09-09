@@ -2,7 +2,7 @@
 
 > One page, every skill, in plain language. What each one is, when it fires, and what you get back. Organized by family. Frontmatter in each `skills/<name>/SKILL.md` is canonical for triggers; this page is canonical for *understanding*.
 
-**18 skills · 6 families · Tier model:** Tier 1 = standalone nano-skill · Tier 2 = cluster/combo · Tier 3 = meta.
+**19 skills · 6 families · Tier model:** Tier 1 = standalone nano-skill · Tier 2 = cluster/combo · Tier 3 = meta.
 
 ---
 
@@ -23,32 +23,32 @@ The domain-specific sibling: nine supermajors (BP through Occidental), each grou
 ### the-architect — the full pipeline
 `/coeus:the-architect` · v1.1 · Tier 2 · deps: prompt-master, caveman, llm-council
 
-When your brief is as messy as your decision is big. Chains prompt engineering → compression → full council in one run. Route A (default) runs the pipeline; Route C (`--explore`) lets the council define the problem first; Route D (`--diagnostic`) answers review/evaluate/yes-no questions single-pass with no council overhead.
+When your brief is as messy as your decision is big. Chains prompt engineering → compression → full council in one run. Route A (default) runs the pipeline; Route C (`--explore`) lets the council define the problem first; Route D (`--diagnostic`) answers review/evaluate/yes-no questions single-pass with no council overhead. Deep dive: [The Architect →](The-Architect.md)
 
 ### morpheus — engineer, compress, execute
 `/coeus:morpheus` · v1.2 · Tier 2 · deps: prompt-master, caveman
 
-"Morph this." Crafts a precision prompt for the target model, compresses it per upstream caveman rules, and — in default AUTO mode — executes it immediately in the same response. Say "review first" to inspect the prompt before it fires. Compresses prompts only, never deliverables.
+"Morph this." Crafts a precision prompt for the target model, compresses it per upstream caveman rules, and — in default AUTO mode — executes it immediately in the same response. Say "review first" to inspect the prompt before it fires. Compresses prompts only, never deliverables. Deep dive: [Morpheus Pipeline →](Morpheus-Pipeline.md)
 
 ### prompt-master — precision prompt engineering *(vendored)*
 `/coeus:prompt-master` · tracks [nidhinjs/prompt-master](https://github.com/nidhinjs/prompt-master) · Tier 1
 
-Model-aware prompt crafting for Claude, ChatGPT, o-series, Gemini, image and video AI. Synced weekly from upstream; Coeus never patches its internals.
+Model-aware prompt crafting for Claude, ChatGPT, o-series, Gemini, image and video AI. Synced weekly from upstream; Coeus never patches its internals. Covered in: [Morpheus Pipeline →](Morpheus-Pipeline.md)
 
 ### caveman — token compression *(vendored)*
 `/coeus:caveman` · tracks [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman) · Tier 1
 
-Ultra-compressed response mode — measured ~65% output-token cut with full technical accuracy. Six intensity levels from lite to classical-Chinese wenyan-ultra. Auto-clarity drops compression for security warnings and destructive-action confirmations. Synced weekly from upstream.
+Ultra-compressed response mode — measured ~65% output-token cut with full technical accuracy. Six intensity levels from lite to classical-Chinese wenyan-ultra. Auto-clarity drops compression for security warnings and destructive-action confirmations. Synced weekly from upstream. Covered in: [Morpheus Pipeline →](Morpheus-Pipeline.md)
 
 ### plugin-creator — the autobot transformer
 `/coeus:plugin-creator` · v1.0 · Tier 1
 
-Turns an idea, a prompt, a workflow note, or a folder of skills into a spec-compliant, installable Claude plugin: canonical 4-key manifest, SKILL.md auto-registration, UTF-8/LF hygiene, and a conformance check that can fail. Encodes every hard-won lesson from Coeus's own conformance history.
+Turns an idea, a prompt, a workflow note, or a folder of skills into a spec-compliant, installable Claude plugin: canonical 4-key manifest, SKILL.md auto-registration, UTF-8/LF hygiene, and a conformance check that can fail. Encodes every hard-won lesson from Coeus's own conformance history. Deep dive: [Plugin-Creator →](Plugin-Creator.md)
 
 ### seer — the router's examiner
 `/coeus:seer` · v1.0 · Tier 1 · subject under test: coeus-router
 
-Spec-driven routing evaluation: synthesizes labeled scenarios from skill frontmatter alone, holds the intended route as a hidden oracle, replays the router blind, grades with a cascading rubric, and proposes golden-set rows. Deterministic checks run before judgment; single-model self-eval is disclosed in every report.
+Spec-driven routing evaluation: synthesizes labeled scenarios from skill frontmatter alone, holds the intended route as a hidden oracle, replays the router blind, grades with a cascading rubric, and proposes golden-set rows. Deterministic checks run before judgment; single-model self-eval is disclosed in every report. Deep dive: [Seer →](Seer.md)
 
 ---
 
@@ -57,7 +57,7 @@ Spec-driven routing evaluation: synthesizes labeled scenarios from skill frontma
 ### minto — answer-first document structuring
 `/coeus:minto` · v1.0 · Tier 2 · deps: llm-council (gated review)
 
-Verified Barbara Minto doctrine — pyramid structure, SCQ introduction, MECE groupings, inductive key line — applied to memos, reports, proposals, gate submissions, and deck storylines. Fires only on explicit intent to *structure* a document, never on generic writing or editing. Learns from repeated corrections via a self-evolution file.
+Verified Barbara Minto doctrine — pyramid structure, SCQ introduction, MECE groupings, inductive key line — applied to memos, reports, proposals, gate submissions, and deck storylines. Fires only on explicit intent to *structure* a document, never on generic writing or editing. Learns from repeated corrections via a self-evolution file. Deep dive: [Minto →](Minto.md)
 
 ---
 
@@ -88,12 +88,17 @@ Kickoff, resume, handover, audit, close — the discipline that lets a project s
 ### atlas — the project, at a glance
 `/coeus:atlas` · v1.3 · Tier 1 · deps: project-lifecycle (reads), llm-council (gated review)
 
-Mines a project — lifecycle files, git repo, document folder, or a six-question interview — into four evergreen outputs, created once and updated in place forever: a self-contained offline HTML atlas (Frame / Now / Map / Story; the Map opens as a group-level Overview with drill-in to per-node ego views, plus List and Grid toggles), a markdown Master-of-Content for link-based navigation, and a visual Contents hub (`atlas_toc.html`) — a clickable table of contents linking every artefact, with an inline SVG explainer of how the outputs relate and quick links into every region and view. Causal history with forks and guardrail badges; never invents topology; unknowns render as marked placeholders.
+Mines a project — lifecycle files, git repo, document folder, or a six-question interview — into four evergreen outputs, created once and updated in place forever: a self-contained offline HTML atlas (Frame / Now / Map / Story; the Map opens as a group-level Overview with drill-in to per-node ego views, plus List and Grid toggles), a markdown Master-of-Content for link-based navigation, and a visual Contents hub (`atlas_toc.html`) — a clickable table of contents linking every artefact, with an inline SVG explainer of how the outputs relate and quick links into every region and view. Causal history with forks and guardrail badges; never invents topology; unknowns render as marked placeholders. Deep dive: [Atlas →](Atlas.md)
 
 ### evergreen-artefacts — evergreen publishing
 `/coeus:evergreen-artefacts` · v1.0 · Tier 1
 
-Agent-neutral publishing to a Synology NAS: every artefact gets a stable evergreen link that redirects to the latest immutable `vN/`; every version carries a `publish.json` audit record with per-file SHA-256. Reverting republishes old content as a *new* version — nothing is ever deleted.
+Agent-neutral publishing to a Synology NAS: every artefact gets a stable evergreen link that redirects to the latest immutable `vN/`; every version carries a `publish.json` audit record with per-file SHA-256. Reverting republishes old content as a *new* version — nothing is ever deleted. Deep dive: [Evergreen Artefacts →](Evergreen-Artefacts.md)
+
+### keymaker — every door in one pass
+`/coeus:keymaker` · v1.0 · Tier 2 · deps: project-lifecycle, atlas, evergreen-artefacts (gated)
+
+Chains `project-lifecycle` and `atlas` into a single coordinated pass over every project deliverable, tracked in a Keyring ledger (green/amber/red/unknown, every row traced to a read file or a user answer). Launches its dependencies via the Skill tool, never reimplements them. Plans and reviews at top tier with delegated Opus/Sonnet execution, then sweeps every visualisation artefact against the house quality bar (`references/quality_bar.md`) idempotently — self-containment outranks styling. Loops until every row is green, capped at three cycles with remaining reds reported honestly. Never fires for a single deliverable. Deep dive: [Keymaker →](Keymaker.md)
 
 ---
 
@@ -111,7 +116,7 @@ Reverse-engineers a DUG Insight `project.dugprj` (undocumented SQLite, schema em
 ### obsidian-vault — vault operations with guardrails
 `/coeus:obsidian-vault` · v1.2 · Tier 1
 
-Direct file operations on a plain-text Obsidian vault — read, search, create, edit, tag, move, delete — with verified obsidian-mcp parity: soft delete to `.trash/`, vault-wide link updating on move, hierarchical tag search. NAS/UNC/mapped-drive paths are first-class. Eight prompt-injection and path-containment guardrails; destructive operations are confirmation-gated.
+Direct file operations on a plain-text Obsidian vault — read, search, create, edit, tag, move, delete — with verified obsidian-mcp parity: soft delete to `.trash/`, vault-wide link updating on move, hierarchical tag search. NAS/UNC/mapped-drive paths are first-class. Eight prompt-injection and path-containment guardrails; destructive operations are confirmation-gated. Deep dive: [Obsidian Vault →](Obsidian-Vault.md)
 
 ---
 
@@ -131,7 +136,7 @@ decision   llm-council · ep-council · the-architect · morpheus
            prompt-master · caveman · plugin-creator · seer
 writing    minto
 tools      ooxml-repair · ooxml-fields · docx-inventory
-           project-lifecycle · atlas · evergreen-artefacts
+           project-lifecycle · atlas · evergreen-artefacts · keymaker
 seismic    dug_binary
 vault      obsidian-vault
 meta       coeus-router

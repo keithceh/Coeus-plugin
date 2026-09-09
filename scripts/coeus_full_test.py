@@ -24,7 +24,7 @@ else:
     ROOT = pathlib.Path(__file__).resolve().parent.parent
 OWNED = {'ep-council', 'llm-council', 'morpheus', 'the-architect', 'plugin-creator',
          'coeus-router', 'ooxml-repair', 'ooxml-fields', 'docx-inventory', 'project-lifecycle',
-         'dug_binary', 'obsidian-vault', 'minto', 'seer', 'atlas'}
+         'dug_binary', 'obsidian-vault', 'minto', 'seer', 'atlas', 'keymaker'}
 VENDORED = {'caveman', 'prompt-master'}
 
 # Description char cap: single source of truth is build-plugin.py's
