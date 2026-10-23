@@ -1,6 +1,6 @@
 ---
 name: ep-council
-version: "1.10"
+version: "1.11"
 argument-hint: "[E&P opportunity — block, well, acquisition, farm-in, JV, divestment]"
 description: >-
   Trigger on: /ep-council, "board review", "investible", "stress-test this deal", "red team this opportunity", "premortem this asset", "through-cycle check", "is this a supermajor trap", "farm-in", "FID", or ANY E&P opportunity evaluation before committing capital.
@@ -34,12 +34,12 @@ If the operator says `/quick-take [opportunity]` or `/quick [opportunity]`, skip
 | # | Member | Primary Lens | Council Trap |
 |---|---|---|---|
 | 1 | BP | Energy transition credibility vs. near-term cash | T1 — Strategy Whiplash |
-| 2 | Chevron | Capital discipline, tier-1 only; megaproject execution risk (Gorgon/Tengiz overruns) | T2 — Tier-2 Masquerade; T11 — Megaproject Overrun |
+| 2 | Chevron | Capital discipline, tier-1 only; megaproject execution risk (Gorgon/Tengiz overruns); non-operator seat economics — $60B Hess bought a place in ExxonMobil's sanction queue, where schedule execution IS capital allocation and PSC cost-bank dials move with every sanction | T2 — Tier-2 Masquerade; T11 — Megaproject Overrun |
 | 3 | TotalEnergies | Integration economics, LNG | T3 — Integration Illusion |
 | 4 | Shell | Portfolio complexity management; duration vs distribution discipline (reserve life, organic renewal, harvest-vs-compounder) | T4 — Complexity Creep; T10 — Duration Drift |
 | 5 | QatarEnergy | Concentration risk, sovereign constraints | T5 — Concentration Kill |
 | 6 | ExxonMobil | Long-cycle capital discipline; normalized-price valuation (XTO lesson) | T6 — Distraction Decision; T12 — Peak-Price Entry |
-| 7 | ConocoPhillips | Short-cycle returns, cash flow focus | T7 — Shale Plateau Cliff |
+| 7 | ConocoPhillips | Short-cycle returns, cash flow focus; flexibility = minimal exposure to long-term service contracts and no long-cycle commitments (the Devon 2016 lesson: shale capital can stop at the pad boundary) | T7 — Shale Plateau Cliff |
 | 8 | ENI | Exploration carry structures, Africa | T8 — Exploration Cost Trap |
 | 9 | Occidental | Leverage discipline post-Anadarko | T9 — Acquisition Leverage Trap |
 
@@ -157,10 +157,10 @@ Run after every red-team round. Any trap firing halts progress until resolved.
 | T5 | Concentration Kill | QatarEnergy | Single geography or asset type >40% of portfolio |
 | T6 | Distraction Decision | ExxonMobil | Opportunity not in Strategy Brief, no amendment proposed |
 | T7 | Shale Plateau Cliff | ConocoPhillips | Short-cycle peak allocation without long-cycle rotation plan |
-| T8 | Exploration Cost Trap | ENI | Balance sheet funding where carry/satellite structure exists |
+| T8 | Exploration Cost Trap | ENI | Balance sheet funding where carry/satellite structure exists; or exploration capital committed by an owner whose hurdle rate cannot carry the pre-FID clock — median deepwater wait is ~7 yrs discovery-to-first-oil, and the variance sits BEFORE FID (3–18 yrs: Venus 4.7+ yrs no sanction; Kaskida 18 yrs to FID; Zama stranded since 2017; Shell Namibia written down) |
 | T9 | Acquisition Leverage Trap | Occidental | M&A debt not serviceable from target FCF at $30/bbl for 24 months, or serviceable only by starving the acquired assets' development capital at trough prices |
 | T10 | Duration Drift | Shell | Distributions funded before/instead of best organic reinvestment; R/P shortening materially faster than production; M&A used as primary reserve-replacement mechanism without a working organic engine (acquired duration ≠ created duration) |
-| T11 | Megaproject Overrun | Chevron | Megaproject FID whose economics survive only the sanction-case cost/schedule — no viability test at P90 overrun (Gorgon $37B→$54B; Tengiz $37B→$48.5B; Kashagan ~$116B; Mozambique +$4.5B) |
+| T11 | Megaproject Overrun | Chevron | Megaproject FID whose economics survive only the sanction-case cost/schedule — no viability test at P90 overrun (Gorgon $37B→$54B; Tengiz $37B→$48.5B; Kashagan ~$116B; Mozambique +$4.5B). Also fires when the sanction case clears only at current (trough) service rates with no mid-cycle rig/vessel-rate test, or when a later phase is sanctioned on early-phase economics while capital-per-daily-barrel escalates across the queue (Stabroek: 2.3x Liza-1 to Uaru) |
 | T12 | Peak-Price Entry | ExxonMobil | Acquisition or entry price clears the return hurdle only at/above the announcement strip — no valuation test at normalized mid-cycle prices; synergy value computed at announcement strip rather than trough (XTO $41B at gas peak; BHP $20.6B at $120 oil; Shell-BG synergies at $90/bbl, closed into $30) |
 
 ---

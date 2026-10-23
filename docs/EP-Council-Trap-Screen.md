@@ -139,6 +139,16 @@ If a competing bidder walked away at a lower price, that price is a data point. 
 
 ---
 
+## T8 + T11 Extensions (Skill v1.11 — CrudeTruth corpus, Oct 2026)
+
+**T8 now also fires on the pre-FID clock.** Exploration capital committed by an owner whose hurdle rate cannot carry the wait. Across 10 producing deepwater fields the median discovery-to-first-oil wait is ~7 years (10-field dataset, survivor-biased — stranded discoveries never reach a first-oil date, so the real wait is longer) — and the variance sits BEFORE FID (3.0–18.1 yrs) while post-FID execution runs a steady 3.3–4.9 yrs. At a 12% hurdle, a dollar arriving in year 7 is worth 45 cents; in year 23 (Kaskida), 7 cents. Evidence: Venus 4.7+ yrs with no sanction pending a fiscal accord; Kaskida 18.1 yrs to FID gated on 20ksi technology; Zama stranded since 2017; Shell's Namibia discoveries written down as uncommercial. Enforcer question: *"At our hurdle rate, what is a dollar of this discovery worth on the median first-oil date — and whose balance sheet owns that clock?"* A state owner can hold a 20-year clock (Petrobras pre-salt); it can also blow the balance sheet holding it ($106B net debt by 2014). Discovery is not a cash date.
+
+**T11 now also fires on trough-rate sanction and phase-economics extrapolation.** (a) A sanction case that clears only at current service rates, with no test at mid-cycle rig/vessel rates: offshore day-rate markets swing multiples within a cycle (Norway anchor-handlers averaged $138k/day in Jan 2026 vs $12k in SE Asia nine months earlier; ONGC jackups halved from $80–90k to $35–40k across 2014–15). (b) Sanctioning phase N on phase-1 economics: Stabroek capital-per-daily-barrel rose 2.3x from Liza-1 ($21,875) to Uaru/Whiptail ($50,800), while the PSC cost-bank entitlement dial moves with every sanction. Enforcer additions: *"Does this FID clear at mid-cycle service rates?"* and *"Which phase's capital intensity is this sanction case actually using?"*
+
+**Evaluated and deferred (evidence bar not met):** a standalone "Trough-Rate Sanction" trap and a tenth council seat (service-side/drilling-contractor lens, e.g. Transocean). The corpus documents the market mechanics richly but names no operator FID or deal that destroyed value specifically from trough-priced inputs — the ≥2-named-failure-case rule stands. A 10th member would also break the 3-3-3 faction symmetry and the member-carries-trap pattern. Both reopen if the full CrudeTruth archive (~170 editions; 10 read, sign-in required for the rest) supplies the named cases.
+
+---
+
 ## Running the Trap Screen
 
 The Green Team runs the trap screen after every red-team round. The screen covers all 13 traps in sequence.

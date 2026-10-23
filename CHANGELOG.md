@@ -2,6 +2,31 @@
 
 ---
 
+## 2026-Oct-23 (v3.27.0) · EP-Council v1.11 — CrudeTruth corpus pass: T8 pre-FID clock, T11 trough-rate + phase-escalation; T13 and 10th seat evaluated and DEFERRED
+
+### Source and coverage
+10 CrudeTruth newsletter articles read (Oct 13–23, 2026: Chevron/Hess/Guyana, 2x rig-move invoices, drillship ownership, Sun Petro, Apache, Transocean day-rate curves, deepwater clock, Exxon Bengaluru, Petrobras 20-yr clock, Devon/Coterra). The daily archive runs ~170 editions; the logged-out newsletter page exposes only these 10 — full-archive read requires LinkedIn sign-in. Coverage caveat recorded; structural decisions below are explicitly reopenable on archive access.
+
+### Changed — T8 Exploration Cost Trap: pre-FID clock prong
+Fires additionally when exploration capital is committed by an owner whose hurdle rate cannot carry the pre-FID wait. Median deepwater discovery-to-first-oil: ~7 yrs (survivor-biased); variance sits BEFORE FID (3.0–18.1 yrs) vs steady 3.3–4.9 after. Cases: Venus 4.7+ yrs no sanction (fiscal accord), Kaskida 18.1 yrs to FID (20ksi gate), Zama stranded since 2017, Shell Namibia written down. New enforcer question: value of a discovery dollar at the median first-oil date, at our hurdle — and whose balance sheet owns that clock.
+
+### Changed — T11 Megaproject Overrun: trough-rate sanction + phase-economics extrapolation prongs
+(a) Sanction case that clears only at current (trough) service rates with no mid-cycle rig/vessel-rate test (Norway AHTS $138k/day Jan-26 vs SE Asia $12k; ONGC jackups halved 2014→15). (b) Phase-N sanctioned on phase-1 economics while capital-per-daily-barrel escalates (Stabroek 2.3x Liza-1→Uaru) and PSC cost-bank dials move per sanction. Council note (Grok/MECE): if T13 evidence later emerges, carve trough-rate OUT of T11 rather than growing it further.
+
+### Changed — 5 member profiles enriched (docs/EP-Council-Council-Members.md)
+Chevron (Hess non-operator queue; "schedule execution is capital allocation"), ConocoPhillips (Devon 2016: flexibility = contract posture; payout policy as cycle memory), TotalEnergies (Venus fiscal gate), Shell (Namibia write-down: discovery ≠ cash date), ExxonMobil (design-one-build-many compresses the post-FID clock — positive pattern).
+
+### Evaluated and DEFERRED — T13 "Trough-Rate Sanction" trap; 10th seat (Transocean, service-side lens)
+The corpus documents rig-market mechanics richly but names NO operator FID/deal that destroyed value from trough-priced inputs — ≥2-named-failure-case rule not met. A 10th member additionally breaks 3-3-3 faction symmetry, the member-carries-trap pattern, and (DeepSeek note) a contractor voting on operator capital allocation carries a structural incentive against the council's cost discipline — if reopened, prefer service-side realism as a Strategy Gate input, not a seat. Reopening condition: named failure cases from the full archive.
+
+### Review chain
+Fable plan → inline execution → advisor review (caught T13/10th-seat evidence-bar failure pre-ship) → abbreviated llm-council second review (2 amendments absorbed: survivor-bias label, coverage-honesty lead; unanimous ship). ep-council declined as reviewer — wrong tool for skill design.
+
+### Files touched
+skills/ep-council/SKILL.md (v1.11), docs/EP-Council-Trap-Screen.md, docs/EP-Council-Council-Members.md, .claude-plugin/plugin.json (3.26.0→3.27.0), CHANGELOG.md, handover, index.html regen.
+
+---
+
 ## 2026-Sep-09 (v3.26.0) · 2026-Sep-09 03:10 · keymaker v1.0.0 — coordinated end-to-end deliverables pass; nine deep-dive skill pages; every skill now documented
 
 ### Added — `keymaker` skill (family: tools, Tier 2)

@@ -58,6 +58,8 @@ Nine supermajor E&P companies, each with distinct institutional memory, a docume
 
 **Council Traps:** T2 — Tier-2 Masquerade (below-tier-1 asset dressed as tier-1); T11 — Megaproject Overrun (sanction-case economics without overrun stress)
 
+**CrudeTruth update (Oct 2026):** The $60B Hess acquisition bought a 30% non-operator seat in ExxonMobil's Stabroek sanction queue — proven resource, but the operator's calendar prices the return. Capital-per-daily-barrel rose 2.3x from Liza-1 to Uaru across the queue, and the PSC cost-bank means Guyana's entitlement dial moves with every new sanction. Lens addition: "offshore, schedule execution is capital allocation" — an FPSO on time still waits for the wells.
+
 ---
 
 ### 3 · TotalEnergies — Energy Integration Business Model
@@ -74,6 +76,8 @@ Nine supermajor E&P companies, each with distinct institutional memory, a docume
 
 **Council Trap:** T3 — Integration Illusion (integration thesis fails at $30/bbl, or under frontier disruption or home-government policy reversal)
 
+**CrudeTruth update (Oct 2026):** Venus (Namibia) adds the fiscal-gate case to the lens: 4.7+ years from discovery with no FID, technically ready, sanction held by a fiscal accord and a <$20/bbl production-cost requirement. The pre-FID clock is a negotiation about who carries the discount-rate cost — each year at 12% costs ~11% of remaining value.
+
 ---
 
 ### 4 · Shell — Energy Trader Strategic Pivot
@@ -89,6 +93,8 @@ Nine supermajor E&P companies, each with distinct institutional memory, a docume
 **Canonical lesson:** What the institution tells itself and the market must match the reservoir. Optimism that becomes misstatement costs the chairman; buybacks that substitute for renewal cost the company its future — elegantly.
 
 **Council Traps:** T4 — Complexity Creep (adding segments without removing any); T10 — Duration Drift (acquired duration ≠ created duration)
+
+**CrudeTruth update (Oct 2026):** Namibia write-down (Jan 2025, high gas content) joins the institutional memory: discovery does not guarantee a cash date — the reminder case for T8's pre-FID clock extension.
 
 ---
 
@@ -124,6 +130,8 @@ Nine supermajor E&P companies, each with distinct institutional memory, a docume
 
 **Council Traps:** T6 — Distraction Decision (not in the Strategy Brief); T12 — Peak-Price Entry (price only works at the announcement strip — XTO lesson)
 
+**CrudeTruth update (Oct 2026):** The positive pattern worth copying: design-one-build-many (Fast4Ward FPSOs, five repetitions in Guyana) compresses the post-FID clock to 3.3 yrs (Yellowtail) and makes each engineering hour spread across more barrels. The post-FID clock is the only one engineers can compress; the pre-FID clock belongs to governments, boards and technology gates.
+
 ---
 
 ### 7 · ConocoPhillips — Upstream Energy Business Strategy Evolution
@@ -139,6 +147,8 @@ Nine supermajor E&P companies, each with distinct institutional memory, a docume
 **Canonical lesson:** The portfolio must be built for the bottom of the cycle, because that is where it will be tested. Short-cycle inventory is a treadmill — fund the long-cycle rotation before the plateau, not after.
 
 **Council Trap:** T7 — Shale Plateau Cliff (short-cycle over-allocation at cycle peak)
+
+**CrudeTruth update (Oct 2026):** Lens sharpened with the Devon 2016 record — a 75% capex cut in one step, core oil held flat, credited to minimal long-term service contracts and no long-cycle commitments. Short-cycle flexibility is a contract posture, not just a rock property. Cycle memory now lives in payout policy, not the rig count (DUCs and crews are the other two stores of capital a rig count misses).
 
 ---
 
