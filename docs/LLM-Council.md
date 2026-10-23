@@ -214,7 +214,7 @@ See [Step-by-Step Walkthrough →](LLM-Council-Walkthrough.md) for what each art
 |------|------|
 | **LLM-Council** | General-purpose decision, plan, or strategy across any domain. You already have a clear problem statement. |
 | **[The Architect](../skills/the-architect/SKILL.md)** | Same, **plus** you want the input first run through Morpheus (precision prompt engineering + caveman compression). Use when the framing of the question is itself uncertain. |
-| **[EP-Council](EP-Council.md)** | The decision is an upstream E&P opportunity (block, well, acquisition, farm-in, JV, divestment). EP-Council uses 9 supermajors and the T0–T12 trap screen instead of the 7-voice council. |
+| **[EP-Council](EP-Council.md)** | The decision is an upstream E&P opportunity (block, well, acquisition, farm-in, JV, divestment). EP-Council uses 9 supermajors and the T0–T13 trap screen instead of the 7-voice council. |
 
 ---
 

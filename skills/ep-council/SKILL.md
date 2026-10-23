@@ -1,17 +1,17 @@
 ---
 name: ep-council
-version: "1.11"
+version: "1.12"
 argument-hint: "[E&P opportunity — block, well, acquisition, farm-in, JV, divestment]"
 description: >-
   Trigger on: /ep-council, "board review", "investible", "stress-test this deal", "red team this opportunity", "premortem this asset", "through-cycle check", "is this a supermajor trap", "farm-in", "FID", or ANY E&P opportunity evaluation before committing capital.
-  Adversarial council for upstream E&P. 9 supermajors stress-test decisions against institutional playbooks, hard failures, through-cycle economics. Strategy Gate, 3 adversarial rounds (3-3-3 factions), 13-trap screen, 9 named votes.
+  Adversarial council for upstream E&P. 9 supermajors stress-test decisions against institutional playbooks, hard failures, through-cycle economics. Strategy Gate, 3 adversarial rounds (3-3-3 factions), 14-trap screen, 9 named votes.
 dependencies: []
 ---
 > Shared rules: confidence markers and hedged voices come from [`_shared/uncertainty_rules.md`](../_shared/uncertainty_rules.md). Apply these whenever this skill emits a judgment, recommendation, or simulated voice.
 
 
 # SYSTEM SKILL: EP-Council Engine v9
-## Strategy Gate | Opportunity Intake | Enforcer Selection | 9 Council Members | T0–T12 Traps
+## Strategy Gate | Opportunity Intake | Enforcer Selection | 9 Council Members | T0–T13 Traps
 
 ---
 
@@ -39,7 +39,7 @@ If the operator says `/quick-take [opportunity]` or `/quick [opportunity]`, skip
 | 4 | Shell | Portfolio complexity management; duration vs distribution discipline (reserve life, organic renewal, harvest-vs-compounder) | T4 — Complexity Creep; T10 — Duration Drift |
 | 5 | QatarEnergy | Concentration risk, sovereign constraints | T5 — Concentration Kill |
 | 6 | ExxonMobil | Long-cycle capital discipline; normalized-price valuation (XTO lesson) | T6 — Distraction Decision; T12 — Peak-Price Entry |
-| 7 | ConocoPhillips | Short-cycle returns, cash flow focus; flexibility = minimal exposure to long-term service contracts and no long-cycle commitments (the Devon 2016 lesson: shale capital can stop at the pad boundary) | T7 — Shale Plateau Cliff |
+| 7 | ConocoPhillips | Short-cycle returns, cash flow focus; flexibility = minimal exposure to long-term service contracts and no long-cycle commitments (the Devon 2016 lesson: shale capital can stop at the pad boundary) | T7 — Shale Plateau Cliff; T13 — Sovereign Seizure (Venezuela 2007: seized outright, 19 years recovering $1.3B through the Citgo auction) |
 | 8 | ENI | Exploration carry structures, Africa | T8 — Exploration Cost Trap |
 | 9 | Occidental | Leverage discipline post-Anadarko | T9 — Acquisition Leverage Trap |
 
@@ -62,13 +62,13 @@ Phase 1.5: Enforcer Selection (opportunity-tailored recommendation presented)
 Phase 2: Strategic Roadmap & Gated Approval ◄── HARD GATE: operator must approve
      │
      ▼
-Round 1: Red Team (3 members) → Council Trap Screen T0–T12
+Round 1: Red Team (3 members) → Council Trap Screen T0–T13
      │
      ▼
-Round 2: Red Team (3 members) → Council Trap Screen T0–T12
+Round 2: Red Team (3 members) → Council Trap Screen T0–T13
      │
      ▼
-Round 3: Red Team (3 members) → Council Trap Screen T0–T12
+Round 3: Red Team (3 members) → Council Trap Screen T0–T13
      │
      ▼
 Phase 4: Green Team Synthesis → Final Vote (9 named votes)
@@ -92,6 +92,8 @@ Ask the operator to provide a **Strategy Document** or answer a **7-dimension qu
 5. **Energy transition positioning** — timeline and ambition level?
 6. **Acceptable leverage** — max net debt/EBITDA or gearing ratio?
 7. **Non-negotiable constraints** — ESG screens, sovereign restrictions, board limits?
+
+Alongside the 7 dimensions (not as one of them), record a **host-state counterparty check**: prior expropriations in the jurisdiction, unpaid NOC receivables, licence dependence, and the counterparty NOC's fiscal health (a state that taxes its own NOC into loss, or a parliament that cannot pass a petroleum law, is an input to every number that follows). Feeds T13.
 
 Lock the Strategy Brief before proceeding. Any opportunity that contradicts the Brief on any dimension fires **T0 — Strategic Drift** immediately.
 
@@ -139,11 +141,11 @@ Each round follows this structure:
 - 🔵 **Blue Team**: Builds and defends the opportunity case; patches Red Team findings
 - 🟢 **Green Team**: Verifies rigour, tests through-cycle assumptions, checks trap screen
 
-After each round: **run Council Trap Screen T0–T12**. Any trap firing must be addressed before the next round begins.
+After each round: **run Council Trap Screen T0–T13**. Any trap firing must be addressed before the next round begins.
 
 ---
 
-## 🔍 COUNCIL TRAP SCREEN (T0–T12)
+## 🔍 COUNCIL TRAP SCREEN (T0–T13)
 
 Run after every red-team round. Any trap firing halts progress until resolved.
 
@@ -162,6 +164,7 @@ Run after every red-team round. Any trap firing halts progress until resolved.
 | T10 | Duration Drift | Shell | Distributions funded before/instead of best organic reinvestment; R/P shortening materially faster than production; M&A used as primary reserve-replacement mechanism without a working organic engine (acquired duration ≠ created duration) |
 | T11 | Megaproject Overrun | Chevron | Megaproject FID whose economics survive only the sanction-case cost/schedule — no viability test at P90 overrun (Gorgon $37B→$54B; Tengiz $37B→$48.5B; Kashagan ~$116B; Mozambique +$4.5B). Also fires when the sanction case clears only at current (trough) service rates with no mid-cycle rig/vessel-rate test, or when a later phase is sanctioned on early-phase economics while capital-per-daily-barrel escalates across the queue (Stabroek: 2.3x Liza-1 to Uaru) |
 | T12 | Peak-Price Entry | ExxonMobil | Acquisition or entry price clears the return hurdle only at/above the announcement strip — no valuation test at normalized mid-cycle prices; synergy value computed at announcement strip rather than trough (XTO $41B at gas peak; BHP $20.6B at $120 oil; Shell-BG synergies at $90/bbl, closed into $30) |
+| T13 | Sovereign Seizure | ConocoPhillips | Committed capital in a jurisdiction with prior expropriation, unpaid NOC receivables, or operation governed by a revocable third-country licence — no treaty/stability protection priced, no haircut-recovery base rate applied. T3 fires when government action makes the economics worse; T13 fires when the equity itself can be taken (Repsol/YPF 2012: 51% seized, ~$5B bonds vs claim; ConocoPhillips+ExxonMobil Venezuela 2007: seized outright, $1.3B still in recovery; Shell Sakhalin-2 2022–24: forced exit, $1.6B writeoff) |
 
 ---
 
@@ -195,7 +198,7 @@ Caveman compression is **never** applied to these artifacts.
 |---|---|
 | `/amend-brief [dimension] [new value]` | Update Strategy Brief; re-run fit check |
 | `/change-enforcer [member]` | Swap Enforcer mid-session; re-state faction allocation |
-| `/trap-screen` | Run T0–T12 check on demand |
+| `/trap-screen` | Run T0–T13 check on demand |
 | `/enforcer` | Show current Enforcer and primary question |
 | `/vote` | Trigger early vote (only after all 3 rounds complete) |
 | `/pause` | Pause session; preserve all context |
@@ -218,4 +221,4 @@ Caveman compression is **never** applied to these artifacts.
 
 ---
 
-*EP-Council Engine v9 · 9 members · T0–T12 traps (13 traps) · 3-3-3 factions · BSL 1.1 · ENERGEIA SERVICES PTE. LTD.*
+*EP-Council Engine v9 · 9 members · T0–T13 traps (14 traps) · 3-3-3 factions · BSL 1.1 · ENERGEIA SERVICES PTE. LTD.*

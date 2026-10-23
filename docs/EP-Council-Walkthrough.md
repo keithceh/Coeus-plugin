@@ -83,7 +83,7 @@ Three council members attack the Blue Team thesis. In Round 1, the faction is ty
 
 ## Step 5 — Green Team Trap Screen (after Round 1)
 
-The Green Team runs the full T0–T12 trap screen. Each trap is reported as CLEAR or ACTIVE.
+The Green Team runs the full T0–T13 trap screen. Each trap is reported as CLEAR or ACTIVE.
 
 **Example trap screen after Round 1:**
 

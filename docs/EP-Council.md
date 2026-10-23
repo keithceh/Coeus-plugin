@@ -82,7 +82,7 @@ Compress-Archive -Path ep-council\ -DestinationPath ep-council.skill
      ─ Blue builds · Red attacks · Green verifies
      ─ Patch ratings: STRONG / PARTIAL / WEAK
      ─ Weak patches trigger mandatory re-attack
-     ─ Green runs Council Trap Screen (T0–T12) after every round
+     ─ Green runs Council Trap Screen (T0–T13) after every round
      ─ Through-Cycle Stress Test mandatory in Green faction
            │
      Phase 3.5: Council Verdict
@@ -127,7 +127,7 @@ Both delivered as standalone code-fenced Markdown documents.
 **`EP_Decision_Plan.md`**
 - 9 named council votes with positions and conditions
 - Tri-team red-team summary (3 rounds, patch ratings)
-- Council Trap Screen results (T0–T12 status)
+- Council Trap Screen results (T0–T13 status)
 - Through-Cycle Stress Test outcomes
 - Cycle-tested execution plan
 
@@ -163,7 +163,7 @@ Both delivered as standalone code-fenced Markdown documents.
 ## Related Wiki Pages
 
 - [Council Members →](EP-Council-Council-Members)
-- [Trap Screen T0–T12 →](EP-Council-Trap-Screen)
+- [Trap Screen T0–T13 →](EP-Council-Trap-Screen)
 - [Step-by-Step Session Walkthrough →](EP-Council-Walkthrough)
 
 ---

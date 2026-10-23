@@ -1,4 +1,4 @@
-# EP-Council — Trap Screen T0–T12
+# EP-Council — Trap Screen T0–T13
 
 The Council Trap Screen is run by the Green Team after **every red-team round**. Any trap firing halts progress until the issue is addressed.
 
@@ -23,6 +23,7 @@ Traps are named after the supermajor whose institutional failure most clearly ex
 | **T10** | Duration Drift | Shell | Distributions funded before/instead of best organic reinvestment; R/P shortening materially faster than production; M&A used as primary reserve-replacement mechanism without a working organic engine (acquired duration ≠ created duration) | Are we funding distributions before the best organic reinvestment is funded, and is R/P shortening materially faster than production? |
 | **T11** | Megaproject Overrun | Chevron | Megaproject FID (>$5B gross capex or >3-year build) whose economics survive only the sanction-case cost/schedule — no viability test at P90 overrun | Does this project still clear the return threshold at P90 cost and schedule — not the sanction case? |
 | **T12** | Peak-Price Entry | ExxonMobil | Acquisition or entry price clears the return hurdle only at/above the announcement strip — no valuation test at normalized mid-cycle prices; synergy value computed at announcement strip rather than trough | Is the price paid conservative relative to normalized mid-cycle earnings power across the full cycle — not the strip on announcement day? |
+| **T13** | Sovereign Seizure | ConocoPhillips | Committed capital where prior expropriation, unpaid NOC receivables, or revocable third-country licences govern — no treaty/stability protection priced | What fraction of claimed value did the LAST expropriated operator in this jurisdiction actually recover, through what instrument, after how many years — and which instrument governs ours? |
 
 ---
 
@@ -145,13 +146,39 @@ If a competing bidder walked away at a lower price, that price is a data point. 
 
 **T11 now also fires on trough-rate sanction and phase-economics extrapolation.** (a) A sanction case that clears only at current service rates, with no test at mid-cycle rig/vessel rates: offshore day-rate markets swing multiples within a cycle (Norway anchor-handlers averaged $138k/day in Jan 2026 vs $12k in SE Asia nine months earlier; ONGC jackups halved from $80–90k to $35–40k across 2014–15). (b) Sanctioning phase N on phase-1 economics: Stabroek capital-per-daily-barrel rose 2.3x from Liza-1 ($21,875) to Uaru/Whiptail ($50,800), while the PSC cost-bank entitlement dial moves with every sanction. Enforcer additions: *"Does this FID clear at mid-cycle service rates?"* and *"Which phase's capital intensity is this sanction case actually using?"*
 
-**Evaluated and deferred (evidence bar not met):** a standalone "Trough-Rate Sanction" trap and a tenth council seat (service-side/drilling-contractor lens, e.g. Transocean). The corpus documents the market mechanics richly but names no operator FID or deal that destroyed value specifically from trough-priced inputs — the ≥2-named-failure-case rule stands. A 10th member would also break the 3-3-3 faction symmetry and the member-carries-trap pattern. Both reopen if the full CrudeTruth archive (~170 editions; 10 read, sign-in required for the rest) supplies the named cases.
+**Deferral register (updated v1.12, full-archive pass — 68 Substack + 10 LinkedIn articles):**
+- **Trough-Rate Sanction:** RETIRED as a trap candidate. Full archive searched; zero named operator FIDs lost to trough-priced service assumptions. The mechanics live on as T11's mid-cycle-rate prong.
+- **Consent-Gate** (deal gated on unsecured third-party approval): one realized loss (Rio Tinto/Riversdale, $3B writedown <2 yrs, Mozambique transport refusal — mining) plus one quantified friction case (Chevron–Hess ROFR arbitration: close delayed ~1 yr, ~$3B profit unrealized per Reuters estimate, $50–100M legal — but Chevron won and closed). One realized E&P loss short of the bar. Closest deferral to clearing.
+- **Divestment-process failure** (BPCL 2019–22, Air India 2018): state-seller privatizations, not operator portfolio decisions. Deferred.
+- **10th seat:** resolved as lens-not-member twice over — service-side realism (contractor incentive misalignment) and host-state counterparty health both enter at the Strategy Gate, not the vote.
+
+**Original v1.11 deferral note (superseded above):** a standalone "Trough-Rate Sanction" trap and a tenth council seat (service-side/drilling-contractor lens, e.g. Transocean). The corpus documents the market mechanics richly but names no operator FID or deal that destroyed value specifically from trough-priced inputs — the ≥2-named-failure-case rule stands. A 10th member would also break the 3-3-3 faction symmetry and the member-carries-trap pattern. Both reopen if the full CrudeTruth archive (~170 editions; 10 read, sign-in required for the rest) supplies the named cases.
+
+---
+
+## T13 — Sovereign Seizure (New in Skill v1.12 — CrudeTruth full-archive pass)
+
+**The trap T3 cannot catch.** T3 fires when government action makes the economics worse. T13 fires when the equity itself can be taken. Three named foreign-operator cases:
+
+- **Repsol/YPF (Argentina, 2012)** — 51% expropriated in a single afternoon; compensated ~$5B in sovereign bonds against a far larger claim; treaty arbitration never ruled — replaced by the cheap settlement. Vaca Muerta, found by Repsol's own geologists, lost entirely.
+- **ConocoPhillips + ExxonMobil (Venezuela, 2007)** — assets seized outright, no negotiation; ConocoPhillips still recovering $1.3B through the Citgo auction two decades later.
+- **Shell / Sakhalin-2 (Russia, 2022–24)** — forced out of 27.5%, $1.6B written off, stake sold to Gazprom below fair value (Gazprom booked a RUB191B gain on the purchase).
+
+**Recurring sub-mechanisms:** compensation at a haircut, in bonds; arbitration-to-settlement (claims that never reach a ruling); the licence-as-counterparty pattern (OFAC GL41B terminated Chevron's Venezuela rights May 2025 — the real counterparty is a third country's Treasury, revocable at discretion); dividend-dependence wipeout (Petersen bought 25% of YPF on debt serviced by YPF's dividends; the state cut them; Petersen bankrupt; Burford's $16.1B award vacated 2026, $1.72B writedown); receivables decay (PDVSA owes Repsol €4.55B).
+
+**Re-entry is a pattern, not an exception — and it does not reset the base rate.** Repsol re-entered Venezuela (Petroquiriquire, Apr 2026, GL50A, proceeds through US-controlled accounts); Chevron swapped back in months after its licence was revoked; Shell is back in Argentina via YPF LNG under decree-based stability. Each instrument is revocable.
+
+**What T13 does NOT cover:** policy reversal that worsens economics (T3); windfall taxes on a counterparty NOC and NOC fiscal decay (Strategy Gate counterparty check, not a trap); domestic NOCs looted by their own state (Gazprom, Pemex — counterparty-health inputs).
+
+**Boundary stress case:** Mozambique LNG — the government failed to secure the area, Total kept its equity, ~$4–4.5B of force-majeure cost. That is T3-side (economics worsened, equity retained). T13 requires the equity or its control to be taken.
+
+**Carrier rationale:** ConocoPhillips, not Shell — Shell holds the largest recent case (Sakhalin-2) but already carries T4+T10; ExxonMobil (co-seized 2007) carries T6+T12. ConocoPhillips is the two-trap-eligible member with a named seizure case, and its 19-year, haircut-settled recovery IS the enforcer question.
 
 ---
 
 ## Running the Trap Screen
 
-The Green Team runs the trap screen after every red-team round. The screen covers all 13 traps in sequence.
+The Green Team runs the trap screen after every red-team round. The screen covers all 14 traps in sequence.
 
 For each trap:
 1. State whether it fires: **CLEAR** or **ACTIVE**

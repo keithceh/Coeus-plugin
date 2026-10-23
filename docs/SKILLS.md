@@ -18,7 +18,7 @@ Seven simulated frontier-model voices (ChatGPT, Grok, Claude, Perplexity, DeepSe
 ### ep-council — the E&P deal killer
 `/coeus:ep-council` · v1.10 · Tier 1
 
-The domain-specific sibling: nine supermajors (BP through Occidental), each ground-truthed against primary-source research, stress-test any upstream opportunity — block, well, farm-in, FID, JV, divestment. A Strategy Gate locks your strategy before red-teaming begins; a 13-trap screen (T0–T12) catches the institutional failure modes that killed real deals — peak-price entry, acquisition leverage, duration drift, megaproject overrun. Nine named votes close every session.
+The domain-specific sibling: nine supermajors (BP through Occidental), each ground-truthed against primary-source research, stress-test any upstream opportunity — block, well, farm-in, FID, JV, divestment. A Strategy Gate locks your strategy before red-teaming begins; a 14-trap screen (T0–T13) catches the institutional failure modes that killed real deals — peak-price entry, acquisition leverage, duration drift, megaproject overrun. Nine named votes close every session.
 
 ### the-architect — the full pipeline
 `/coeus:the-architect` · v1.1 · Tier 2 · deps: prompt-master, caveman, llm-council

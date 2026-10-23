@@ -2,6 +2,31 @@
 
 ---
 
+## 2026-Oct-23 (v3.28.0) · EP-Council v1.12 — T14th trap: T13 Sovereign Seizure; full CrudeTruth archive pass (68 Substack + 10 LinkedIn articles)
+
+### Source and coverage
+The Substack (crudetruth.substack.com) carries the complete back-archive: 68 posts (Jun 4–Sep 24, 2026), fully enumerable logged-out via the archive API — the previous "~170 editions behind sign-in" estimate was wrong. Four parallel extraction subagents (opus/sonnet/sonnet/haiku) processed 26 decision-relevant articles against PRE-COMMITTED qualifying rules (written to scratchpad before any report was read); orchestrator read Rio Tinto directly. Combined with the 10 LinkedIn editions from v3.27.0, archive coverage is complete for decision-relevant material.
+
+### Added — T13 Sovereign Seizure (ConocoPhillips; 14 traps, T0–T13)
+The trap T3 cannot catch: T3 fires when government action makes the economics worse; T13 fires when the equity itself can be taken. Three named foreign-operator cases: Repsol/YPF 2012 (51% expropriated in an afternoon, ~$5B in bonds vs a far larger claim, treaty arbitration replaced by cheap settlement, Vaca Muerta lost); ConocoPhillips+ExxonMobil Venezuela 2007 (seized outright, COP still recovering $1.3B through the Citgo auction two decades on); Shell/Sakhalin-2 2022–24 (forced exit, $1.6B writeoff, stake sold to Gazprom below fair value). Sub-mechanisms documented: compensation haircuts in bonds, arbitration-to-settlement, licence-as-counterparty (OFAC GL41B/GL50A), dividend-dependence wipeout (Petersen/Burford $1.72B), NOC receivables decay (PDVSA owes Repsol €4.55B). Re-entry (Repsol, Chevron, Shell all back on revocable instruments) does not reset the base rate. Boundary stress case set by council review: Mozambique = T3-side (equity retained). Carrier rationale documented: ConocoPhillips is the two-trap-eligible member whose own 19-year haircut recovery IS the enforcer question (Shell holds the larger case but carries T4+T10; ExxonMobil carries T6+T12).
+
+### Added — Strategy Gate host-state counterparty check (input, not an 8th dimension)
+Prior expropriations, unpaid NOC receivables, licence dependence, counterparty-NOC fiscal health (a state that taxes its own NOC into loss — Gazprom RUB1.3trn MET hike; a parliament that cannot pass a petroleum law — Kuwait's 13 dissolutions). Resolves the 10th-seat question twice over: service-side realism (v3.27.0) and host-state lens both enter at the gate, not the vote. T0's "7 dimensions" unchanged.
+
+### Changed — Member profiles enriched (5)
+ConocoPhillips (T13 carrier + rationale), ENI (dual-exploration securitization mechanics: 20–40% farm-downs at development-upside valuation, €6.5B recycled, $50-Brent compression vulnerability), TotalEnergies (Judgment Fund nuance: nominal ~zero, real cost 4 years dead capital + AG-suit clawback; Mozambique $4–4.5B pause cost), QatarEnergy (ADNOC quota exit, Aramco Jafurah midstream monetization + SABIC quiet failure, Kuwait institutional-paralysis counterexample), Chevron (Hess ROFR friction quantified: ~1 yr delay, ~$3B unrealized, $50–100M legal).
+
+### Deferral register (Trap-Screen doc)
+Trough-Rate Sanction RETIRED (full archive: zero operator cases; mechanics live in T11's mid-cycle prong). Consent-Gate: closest to clearing (Riversdale realized + Chevron–Hess quantified friction; one realized E&P loss short). Divestment-process failure (BPCL/Air India): state-seller cases, deferred. Buffett/COP 2008 ($7B at ~$80 avg, WTI $147→$32, sold at "several billion" loss) added as T12 corroboration via Members context.
+
+### Review chain
+Fable plan → 4 parallel subagent extractions against pre-committed qualifying rules → advisor (carrier-conflict + count-sweep + MECE-boundary directives) → abbreviated llm-council second review with the T3/T13 boundary stress test → ship. ep-council declined as reviewer (wrong tool for skill design).
+
+### Files touched
+skills/ep-council/SKILL.md (v1.12: T13 row, COP row, Strategy Gate check, all counts), docs/EP-Council-Trap-Screen.md (T13 section, deferral register), docs/EP-Council-Council-Members.md (5 profiles), README.md (T13 row + counts), docs/EP-Council.md, docs/EP-Council-Walkthrough.md, docs/LLM-Council.md, docs/SKILLS.md, Coeus_LLM_HANDOVER.md, .claude-plugin/plugin.json (3.27.0→3.28.0), index.html regen.
+
+---
+
 ## 2026-Oct-23 (v3.27.0) · EP-Council v1.11 — CrudeTruth corpus pass: T8 pre-FID clock, T11 trough-rate + phase-escalation; T13 and 10th seat evaluated and DEFERRED
 
 ### Source and coverage

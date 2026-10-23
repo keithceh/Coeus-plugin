@@ -60,6 +60,8 @@ Nine supermajor E&P companies, each with distinct institutional memory, a docume
 
 **CrudeTruth update (Oct 2026):** The $60B Hess acquisition bought a 30% non-operator seat in ExxonMobil's Stabroek sanction queue — proven resource, but the operator's calendar prices the return. Capital-per-daily-barrel rose 2.3x from Liza-1 to Uaru across the queue, and the PSC cost-bank means Guyana's entitlement dial moves with every new sanction. Lens addition: "offshore, schedule execution is capital allocation" — an FPSO on time still waits for the wells.
 
+**Pre-emption friction (quantified):** The Hess close was delayed ~1 year by the Exxon/CNOOC Stabroek ROFR arbitration — ~180 kb/d of Guyana output out of reach, ~$3B profit unrealized (Reuters est.), $50–100M legal. Chevron won; the consent risk was survivable but never free. (Feeds the Consent-Gate deferral register.)
+
 ---
 
 ### 3 · TotalEnergies — Energy Integration Business Model
@@ -77,6 +79,8 @@ Nine supermajor E&P companies, each with distinct institutional memory, a docume
 **Council Trap:** T3 — Integration Illusion (integration thesis fails at $30/bbl, or under frontier disruption or home-government policy reversal)
 
 **CrudeTruth update (Oct 2026):** Venus (Namibia) adds the fiscal-gate case to the lens: 4.7+ years from discovery with no FID, technically ready, sanction held by a fiscal accord and a <$20/bbl production-cost requirement. The pre-FID clock is a negotiation about who carries the discount-rate cost — each year at 12% costs ~11% of remaining value.
+
+**Full-archive addendum:** The wind-lease recovery nuance — Washington took back two leases bought for $928M and refunds up to original price via the Judgment Fund: nominal cost ~zero, REAL cost ~4 years of capital with no return plus clawback risk (seven state AGs suing). Mozambique: ~$4–4.5B sunk during the 4.5-year force-majeure pause, first gas slipped 2024→2029. The lens sharpens to: governments are project INPUTS to be balanced (Washington, Paris, Maputo, Kampala) — and an input can fail like any other.
 
 ---
 
@@ -111,6 +115,8 @@ Nine supermajor E&P companies, each with distinct institutional memory, a docume
 **Canonical lesson:** Concentration is survivable only with the lowest cost position and demonstrated willingness to pause development entirely rather than damage the asset. If you cannot win a price war, do not build into a glut.
 
 **Council Trap:** T5 — Concentration Kill (>40% exposure in one geography or asset type)
+
+**NOC-landscape addendum (Oct 2026):** Comparators for the sovereign lens — ADNOC left its OPEC quota (May 2026) and is deploying $150B to reach 5.0 Mb/d by 2027; Aramco monetizes midstream while operating (Jafurah: 49% of midstream to GIP for $11.1B, operatorship kept; note its SABIC quiet failure — $69.1B for 70%, 2024 net profit $410.6M); Kuwait is the institutional-paralysis counterexample (13 parliament dissolutions 2006–24, Project Kuwait shelved, Dow-PIC $17.4B cancelled AT closing, ~25 years to add what Iraq added in 10). The constraint that matters can be institutional, not geological.
 
 ---
 
@@ -150,6 +156,8 @@ Nine supermajor E&P companies, each with distinct institutional memory, a docume
 
 **CrudeTruth update (Oct 2026):** Lens sharpened with the Devon 2016 record — a 75% capex cut in one step, core oil held flat, credited to minimal long-term service contracts and no long-cycle commitments. Short-cycle flexibility is a contract posture, not just a rock property. Cycle memory now lives in payout policy, not the rig count (DUCs and crews are the other two stores of capital a rig count misses).
 
+**Second trap — T13 Sovereign Seizure (v1.12):** Venezuela 2007: assets seized outright, no negotiation; 19 years recovering $1.3B through the Citgo auction. The institutional memory is the recovery discipline — seizures settle at haircuts, through courts, over decades. Carrier rationale: Shell holds the larger recent case (Sakhalin-2) but already carries T4+T10; ExxonMobil (co-seized 2007) carries T6+T12; ConocoPhillips is the two-trap-eligible member whose own history IS the enforcer question. Joins the two-trap club.
+
 ---
 
 ### 8 · ENI — Corporate Financial Exploration Model
@@ -165,6 +173,8 @@ Nine supermajor E&P companies, each with distinct institutional memory, a docume
 **Canonical lesson:** Structure is an E&P tool: early dilution, satellites, and floating infrastructure convert capital-scale disadvantage and country risk into a self-funding loop. If you're defaulting to balance-sheet funding, ask why a better structure doesn't exist.
 
 **Council Trap:** T8 — Exploration Cost Trap (funding conventional exploration when carry/FLNG/satellite structure exists)
+
+**CrudeTruth update (full archive, Oct 2026):** The dual-exploration model detailed — explore frontier, sell 20–40% of each discovery at development-upside valuation, keep a carried interest, recycle into the next campaign (~€6.5B cashed from Enilive+Plenitude in two years; satellites Vår Energi 63%, Azule 50%). Stated vulnerability: disposal value is priced on discovery value, so a $50 Brent compresses the whole machine. Exploration (~€1.5–2B/yr) is the last budget line Eni cuts — the inverse of every other major.
 
 ---
 
@@ -204,6 +214,6 @@ The Enforcer is selected in Phase 1.5. EP-Council provides an opportunity-tailor
 
 ---
 
-*See also: [Trap Screen T0–T12 →](EP-Council-Trap-Screen)*
+*See also: [Trap Screen T0–T13 →](EP-Council-Trap-Screen)*
 
 Go back to the [Main README](../README.md).
